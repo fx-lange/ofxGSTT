@@ -1,47 +1,46 @@
-#include "ofxGSTTTranscriber.h"
+#include "ofxGSTTTranscriptor.h"
 
-ofxGSTTTranscriber::ofxGSTTTranscriber() :
+ofxGSTTTranscriptor::ofxGSTTTranscriptor() :
 		ofThread() {
 	this->id = id;
 	this->bFinished = false;
 	this->isEncoded = false;
-	this->filename = filename;
-	ofLog(OF_LOG_VERBOSE,filename);
-
+	this->bFree = true;
 	total_samples = 0;//TODO sinn hier
 }
 
-void ofxGSTTTranscriber::setFilename(char filename[]){
-	this->filename = filename;
+void ofxGSTTTranscriptor::setFilename(char * _filename){
+	ofLog(OF_LOG_VERBOSE,"set filename: %s",_filename);
+	memcpy(filename,_filename,strlen(_filename));
 }
 
-bool ofxGSTTTranscriber::isFree(){
+bool ofxGSTTTranscriptor::isFree(){
 	return bFree;
 }
 
-void ofxGSTTTranscriber::reserve(){
+void ofxGSTTTranscriptor::reserve(){
 	bFree = false;
 }
 
-bool ofxGSTTTranscriber::isFinished(){
+bool ofxGSTTTranscriptor::isFinished(){
 	return bFinished;
 }
 
-void ofxGSTTTranscriber::startTranscribing() {
-	bFinished = false;
+void ofxGSTTTranscriptor::startTranscribing() {
+	ofLog(OF_LOG_VERBOSE,"start transcribing");
 	startThread();
 }
 
-void ofxGSTTTranscriber::stopTranscribing(){
+void ofxGSTTTranscriptor::stopTranscribing(){
 	//TODO
 	bFinished = true;
 }
 
-void ofxGSTTTranscriber::threadedFunction() {
+void ofxGSTTTranscriptor::threadedFunction() {
 	//loop while thread is running
 	while (isThreadRunning() == true) {
 		if(!isEncoded){
-			ofLog(OF_LOG_VERBOSE,"start encoding");
+
 			isEncoded = encodeToFlac();
 			if(!isEncoded){
 				threadRunning = false;
@@ -54,7 +53,8 @@ void ofxGSTTTranscriber::threadedFunction() {
 	}
 }
 
-bool ofxGSTTTranscriber::encodeToFlac() {
+bool ofxGSTTTranscriptor::encodeToFlac() {
+	ofLog(OF_LOG_VERBOSE,"init encoding");
 	FLAC__bool ok = true;
 	FLAC__StreamEncoder *encoder = 0;
 	FLAC__StreamEncoderInitStatus init_status;
@@ -68,7 +68,7 @@ bool ofxGSTTTranscriber::encodeToFlac() {
 	char wavFile[32];
 	sprintf(wavFile,"%s.wav",filename);
 	if ((fin = fopen(wavFile, "rb")) == NULL) {
-		fprintf(stderr, "ERROR: opening %s for output\n", "data/mydata.wav"); //TODO use ofLog
+		ofLog(OF_LOG_ERROR, "ERROR: opening %s for output\n", wavFile);
 		return false;
 	}
 
@@ -130,6 +130,7 @@ bool ofxGSTTTranscriber::encodeToFlac() {
 		}
 	}
 
+	ofLog(OF_LOG_VERBOSE,"start encoding");
 	/* read blocks of samples from WAVE file and feed to encoder */
 	if (ok) {
 		size_t left = (size_t) total_samples;
@@ -229,7 +230,7 @@ bool ofxGSTTTranscriber::encodeToFlac() {
 }
 
 
-void ofxGSTTTranscriber::progress_callback(const FLAC__StreamEncoder *encoder, FLAC__uint64 bytes_written, FLAC__uint64 samples_written, unsigned frames_written, unsigned total_frames_estimate, void *client_data)
+void ofxGSTTTranscriptor::progress_callback(const FLAC__StreamEncoder *encoder, FLAC__uint64 bytes_written, FLAC__uint64 samples_written, unsigned frames_written, unsigned total_frames_estimate, void *client_data)
 {
 	(void)encoder, (void)client_data;
 

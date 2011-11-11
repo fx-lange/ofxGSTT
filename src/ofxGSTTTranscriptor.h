@@ -8,10 +8,10 @@
 
 #define READSIZE 1024
 
-class ofxGSTTTranscriber : protected ofThread{
+class ofxGSTTTranscriptor : protected ofThread{
 public:
-	ofxGSTTTranscriber();
-	virtual ~ofxGSTTTranscriber(){ }
+	ofxGSTTTranscriptor();
+	virtual ~ofxGSTTTranscriptor(){ }
 
 	void setFilename(char filename[]);
 
@@ -23,7 +23,7 @@ public:
 
 protected:
 	int id;
-	char * filename;
+	char filename[64];
 	bool bFinished;
 	bool isEncoded;
 	bool bFree;

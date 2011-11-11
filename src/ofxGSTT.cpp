@@ -58,8 +58,8 @@ void ofxGSTT::audioIn(ofAudioEventArgs& event){
 	// this is how we get the root of rms :)
 	curVol = sqrt( curVol );
 
-	smoothedVol *= 0.93;
-	smoothedVol += 0.07 * curVol;
+	smoothedVol *= 0.8; //TODO settings for this ratio needed
+	smoothedVol += 0.2 * curVol;
 
 	//lets scale the vol up to a 0-1 range
 	scaledVol = ofMap(smoothedVol, 0.0, 0.17, 0.0, 1.0, true);
@@ -86,10 +86,10 @@ void ofxGSTT::audioIn(ofAudioEventArgs& event){
 
 void ofxGSTT::prepareRecording(){
 	ofLog(OF_LOG_VERBOSE,"prepare recording");
-	ofxGSTTTranscriber * nextTranscriber = NULL;
+	ofxGSTTTranscriptor * nextTranscriber = NULL;
 	recorderId = 0;
 	for(int i=0;i<transcriber.size();++i){
-		ofxGSTTTranscriber * tmpTranscriber = transcriber[i];
+		ofxGSTTTranscriptor * tmpTranscriber = transcriber[i];
 		if(tmpTranscriber->isFree()){
 			ofLog(OF_LOG_VERBOSE,"free transcriber found");
 			recorderId = i;
@@ -100,7 +100,7 @@ void ofxGSTT::prepareRecording(){
 	//new one if nothing is free
 	if(nextTranscriber==NULL){
 		ofLog(OF_LOG_VERBOSE,"all transcribers reserved -> create new one");
-		nextTranscriber = new ofxGSTTTranscriber();
+		nextTranscriber = new ofxGSTTTranscriptor();
 		recorderId = transcriber.size();
 		transcriber.push_back(nextTranscriber);
 	}
@@ -110,7 +110,7 @@ void ofxGSTT::prepareRecording(){
 	sprintf(filename,"data/tmpaudio%i",recorderId);
 	nextTranscriber->setFilename(filename);
 	nextTranscriber->reserve();
-	sprintf(filename,"%s.wav");
+	sprintf(filename,"%s.wav",filename);
 	outfile = sf_open(filename, SFM_WRITE, &info) ;
 
 	if (!outfile){
@@ -123,7 +123,6 @@ void ofxGSTT::prepareRecording(){
 void ofxGSTT::finishRecording(){
 	ofLog(OF_LOG_VERBOSE,"finish recording");
 	bRecordingBlocked = true;
-	ofLog(OF_LOG_VERBOSE,"start transcribing");
-//	transcriber[recorderId]->startTranscribing();
+	transcriber[recorderId]->startTranscribing();
 	sf_close(outfile);
 }

@@ -2,7 +2,7 @@
 #define _STTG_H_
 
 #include "ofMain.h"
-#include "ofxGSTTTranscriber.h"
+#include "ofxGSTTTranscriptor.h"
 #include "ofxTimer.h"
 #include "sndfile.h"
 
@@ -22,7 +22,7 @@ protected:
 	void prepareRecording();
 	void finishRecording();
 
-	vector<ofxGSTTTranscriber*> transcriber;
+	vector<ofxGSTTTranscriptor*> transcriber;
 
 	/*** SOUND INPUT ***/
 	int bufferSize;
