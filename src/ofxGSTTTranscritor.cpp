@@ -107,7 +107,7 @@ bool ofxGSTTTranscriptor::flacToGoogle() {
 		data.events = events;
 
 		curl_easy_setopt(curl, CURLOPT_WRITEDATA, &data);
-		curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, myOwnwritefunc);
+		curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, writeResponseFunc);
 
 
 		res = curl_easy_perform(curl);

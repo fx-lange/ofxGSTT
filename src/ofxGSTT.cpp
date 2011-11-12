@@ -58,14 +58,15 @@ void ofxGSTT::audioIn(ofAudioEventArgs& event){
 	// this is how we get the root of rms :)
 	curVol = sqrt( curVol );
 
-	smoothedVol *= 0.4; //TODO settings for this ratio needed
-	smoothedVol += 0.6 * curVol;
+	smoothedVol *= 0.9; //TODO settings for this ratio needed
+	smoothedVol += 0.1 * curVol;
 
 	//lets scale the vol up to a 0-1 range
 	scaledVol = ofMap(smoothedVol, 0.0, 0.17, 0.0, 1.0, true);
+	float scaleCurVolume = ofMap(curVol, 0.0, 0.17, 0.0, 1.0, true);
 //	cout << "Volume: cur: " << curVol << "smooth: " << curVol << "scaled: " << curVol << endl;
 
-	bool bActiveVolume = scaledVol > soundThreshold;
+	bool bActiveVolume = scaleCurVolume > soundThreshold;
 
 	//TODO should be in an extra update function?!
 	if(bActiveVolume){

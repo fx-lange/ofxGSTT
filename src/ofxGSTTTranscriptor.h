@@ -3,6 +3,7 @@
 
 #include "ofMain.h"
 #include "ofThread.h"
+#include "googleResponseParser.h"
 
 #include "FLAC/metadata.h"
 #include "FLAC/stream_encoder.h"
@@ -18,7 +19,7 @@ class ofxGSTTResponseArgs : public ofEventArgs{
 	long tReceived;
 	int source;
 	string msg;
-	float occurence;
+	float confidence;
 };
 
 class ofxGSTTEvents{
@@ -32,15 +33,15 @@ struct extraData{
 	ofxGSTTEvents * events;
 };
 
-static size_t myOwnwritefunc(void *ptr, size_t size, size_t nmemb, extraData * data)
+static size_t writeResponseFunc(void *ptr, size_t size, size_t nmemb, extraData * data)
 {
-  char test[1024];
+  char jsonLine[1024];
   size_t cpySize = size*nmemb;
   if(cpySize > 1024){
 	  cpySize =  1024;
   }
-  memcpy(test, ptr, size*nmemb);
-  printf("ID: %i ANTWORT: %s",data->id,test);
+  memcpy(jsonLine, ptr, size*nmemb);
+  printf("ID: %i ANTWORT: %s",data->id,jsonLine);
 
   //EVENT MESS
   ofxGSTTResponseArgs response;
@@ -49,11 +50,15 @@ static size_t myOwnwritefunc(void *ptr, size_t size, size_t nmemb, extraData * d
   response.tReceived = ofGetSystemTime();
 //TODO json -> string
 
+  googleResponseParser parser;
+  parser.parseJSON((char*)ptr);
+  response.msg = parser.utterance;
+  response.confidence = parser.confidence;
   ofNotifyEvent(data->events->gsttApiResponseEvent, response);
   return size*nmemb;
 }
 
-static size_t myOwnwritefunc(void *ptr, size_t size, size_t nmemb, extraData * data);
+static size_t writeResponseFunc(void *ptr, size_t size, size_t nmemb, extraData * data);
 
 class ofxGSTTTranscriptor : protected ofThread{
 public:
