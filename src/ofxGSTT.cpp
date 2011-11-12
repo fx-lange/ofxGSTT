@@ -123,6 +123,6 @@ void ofxGSTT::prepareRecording(){
 void ofxGSTT::finishRecording(){
 	ofLog(OF_LOG_VERBOSE,"finish recording");
 	bRecordingBlocked = true;
-	transcriber[recorderId]->startTranscribing();
+	transcriber[recorderId]->startTranscription();
 	sf_close(outfile);
 }

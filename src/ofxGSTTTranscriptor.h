@@ -2,9 +2,10 @@
 #define _STTGTRANSCRIBER_H_
 
 #include "ofMain.h"
-#include "ofxThread.h"
+#include "ofThread.h"
 #include "FLAC/metadata.h"
 #include "FLAC/stream_encoder.h"
+#include <curl/curl.h>
 
 #define READSIZE 1024
 
@@ -15,7 +16,7 @@ public:
 
 	void setFilename(char filename[]);
 
-	void startTranscribing();
+	void startTranscription();
 	void stopTranscribing();
 	void reserve();
 	bool isFree();
@@ -23,12 +24,15 @@ public:
 
 protected:
 	int id;
-	char filename[64];
+	char wavFile[64];
+	char flacFile[64];
 	bool bFinished;
 	bool isEncoded;
 	bool bFree;
 
 	virtual void threadedFunction();
+
+	bool flacToGoogle();
 
 	bool encodeToFlac();
 	//ENCODE TO FLAC STUFF
