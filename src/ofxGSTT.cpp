@@ -14,7 +14,7 @@ ofxGSTT::ofxGSTT(ofBaseApp * baseApp){
 	bActiveVolume = false;
 	bRecording = false;
 	bRecordingBlocked = true;
-	timerRecording.setup(2000,false);
+	timerRecording.setup(500,false);
 	soundThreshold = 0.f;
 	recorderId = 0;
 
@@ -58,8 +58,8 @@ void ofxGSTT::audioIn(ofAudioEventArgs& event){
 	// this is how we get the root of rms :)
 	curVol = sqrt( curVol );
 
-	smoothedVol *= 0.8; //TODO settings for this ratio needed
-	smoothedVol += 0.2 * curVol;
+	smoothedVol *= 0.4; //TODO settings for this ratio needed
+	smoothedVol += 0.6 * curVol;
 
 	//lets scale the vol up to a 0-1 range
 	scaledVol = ofMap(smoothedVol, 0.0, 0.17, 0.0, 1.0, true);
@@ -94,6 +94,7 @@ void ofxGSTT::prepareRecording(){
 			ofLog(OF_LOG_VERBOSE,"free transcriber found");
 			recorderId = i;
 			nextTranscriber = tmpTranscriber;
+			break;
 		}
 	}
 
