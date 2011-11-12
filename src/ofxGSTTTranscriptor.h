@@ -9,9 +9,26 @@
 
 #define READSIZE 1024
 
+struct extraData{
+	int id;
+	long timestamp;
+};
+
+static size_t myOwnwritefunc(void *ptr, size_t size, size_t nmemb, extraData * data)
+{
+  char test[1024];
+  size_t cpySize = size*nmemb;
+  if(cpySize > 1024){
+	  cpySize =  1024;
+  }
+  memcpy(test, ptr, size*nmemb);
+  printf("ID: %i ANTWORT: %s",data->id,test);
+  return size*nmemb;
+}
+
 class ofxGSTTTranscriptor : protected ofThread{
 public:
-	ofxGSTTTranscriptor();
+	ofxGSTTTranscriptor(int id);
 	virtual ~ofxGSTTTranscriptor(){ }
 
 	void setFilename(char filename[]);

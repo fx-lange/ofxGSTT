@@ -16,7 +16,7 @@ ofxGSTT::ofxGSTT(ofBaseApp * baseApp){
 	bRecordingBlocked = true;
 	timerRecording.setup(500,false);
 	soundThreshold = 0.f;
-	recorderId = 0;
+	transcriptorId = 0;
 
 	info.format=SF_FORMAT_WAV | SF_FORMAT_PCM_16;
 	info.frames = sampleRate*60;
@@ -87,12 +87,12 @@ void ofxGSTT::audioIn(ofAudioEventArgs& event){
 void ofxGSTT::prepareRecording(){
 	ofLog(OF_LOG_VERBOSE,"prepare recording");
 	ofxGSTTTranscriptor * nextTranscriber = NULL;
-	recorderId = 0;
+	transcriptorId = 0;
 	for(int i=0;i<transcriber.size();++i){
 		ofxGSTTTranscriptor * tmpTranscriber = transcriber[i];
 		if(tmpTranscriber->isFree()){
 			ofLog(OF_LOG_VERBOSE,"free transcriber found");
-			recorderId = i;
+			transcriptorId = i;
 			nextTranscriber = tmpTranscriber;
 			break;
 		}
@@ -101,14 +101,14 @@ void ofxGSTT::prepareRecording(){
 	//new one if nothing is free
 	if(nextTranscriber==NULL){
 		ofLog(OF_LOG_VERBOSE,"all transcribers reserved -> create new one");
-		nextTranscriber = new ofxGSTTTranscriptor();
-		recorderId = transcriber.size();
+		transcriptorId = transcriber.size();
+		nextTranscriber = new ofxGSTTTranscriptor(transcriptorId);
 		transcriber.push_back(nextTranscriber);
 	}
 
 
 	char filename[32];
-	sprintf(filename,"data/tmpaudio%i",recorderId);
+	sprintf(filename,"data/tmpaudio%i",transcriptorId);
 	nextTranscriber->setFilename(filename);
 	nextTranscriber->reserve();
 	sprintf(filename,"%s.wav",filename);
@@ -124,6 +124,6 @@ void ofxGSTT::prepareRecording(){
 void ofxGSTT::finishRecording(){
 	ofLog(OF_LOG_VERBOSE,"finish recording");
 	bRecordingBlocked = true;
-	transcriber[recorderId]->startTranscription();
+	transcriber[transcriptorId]->startTranscription();
 	sf_close(outfile);
 }

@@ -1,6 +1,6 @@
 #include "ofxGSTTTranscriptor.h"
 
-ofxGSTTTranscriptor::ofxGSTTTranscriptor() :
+ofxGSTTTranscriptor::ofxGSTTTranscriptor(int id) :
 		ofThread() {
 	this->id = id;
 	this->bFinished = false;
@@ -94,6 +94,15 @@ bool ofxGSTTTranscriptor::flacToGoogle() {
 				"https://www.google.com/speech-api/v1/recognize?xjerr=1&client=chromium&lang=de-de");
 		curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headerlist);
 		curl_easy_setopt(curl, CURLOPT_HTTPPOST, formpost);
+
+		extraData data;
+		data.id = id;
+		data.timestamp = ofGetElapsedTimeMicros();
+
+		curl_easy_setopt(curl, CURLOPT_WRITEDATA, &data);
+		curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, myOwnwritefunc);
+
+
 		res = curl_easy_perform(curl);
 
 		//cleanup

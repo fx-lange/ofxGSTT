@@ -38,7 +38,7 @@ protected:
 	bool bActiveVolume;
 	bool bRecording;
 	bool bRecordingBlocked;
-	int recorderId;
+	int transcriptorId;
 	ofxTimer timerRecording;
 	SF_INFO info;
 	SNDFILE* outfile;
