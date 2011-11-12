@@ -6,6 +6,8 @@
 #include "ofxTimer.h"
 #include "sndfile.h"
 
+
+
 class ofxGSTT{
 public:
 	ofxGSTT(ofBaseApp * baseApp);
@@ -13,6 +15,8 @@ public:
 	bool isRecording();
 
 	void audioIn(ofAudioEventArgs & event);
+
+	ofxGSTTEvents events;
 
 	//GUI settings
 	float soundThreshold;

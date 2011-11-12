@@ -1,11 +1,13 @@
 #include "ofxGSTTTranscriptor.h"
 
-ofxGSTTTranscriptor::ofxGSTTTranscriptor(int id) :
+
+ofxGSTTTranscriptor::ofxGSTTTranscriptor(int id,ofxGSTTEvents * events) :
 		ofThread() {
 	this->id = id;
 	this->bFinished = false;
 	this->isEncoded = false;
 	this->bFree = true;
+	this->events = events;
 	total_samples = 0; //TODO sinn hier
 }
 
@@ -56,6 +58,10 @@ void ofxGSTTTranscriptor::threadedFunction() {
 			bFinished = true;
 			bFree = true;
 
+			  ofxGSTTResponseArgs response;
+			  response.tSend = 0;
+//			  ofNotifyEvent(ofEvents.gsttApiResponseEvent, response,&ofEvents); //das hat funktioniert
+//			  ofNotifyEvent(blablaevent.gsttApiResponseEvent, response,&ofEvents); //das hat funktioniert
 		}
 //	}
 }
@@ -97,7 +103,8 @@ bool ofxGSTTTranscriptor::flacToGoogle() {
 
 		extraData data;
 		data.id = id;
-		data.timestamp = ofGetElapsedTimeMicros();
+		data.timestamp = ofGetSystemTime();
+		data.events = events;
 
 		curl_easy_setopt(curl, CURLOPT_WRITEDATA, &data);
 		curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, myOwnwritefunc);

@@ -79,7 +79,7 @@ void ofxGSTT::audioIn(ofAudioEventArgs& event){
 			finishRecording();
 			prepareRecording();
 		}else{
-			sf_write_float(outfile, event.buffer, bufferSize*2);
+			sf_write_float(outfile, event.buffer, event.bufferSize*2);
 		}
 	}
 }
@@ -102,7 +102,7 @@ void ofxGSTT::prepareRecording(){
 	if(nextTranscriber==NULL){
 		ofLog(OF_LOG_VERBOSE,"all transcribers reserved -> create new one");
 		transcriptorId = transcriber.size();
-		nextTranscriber = new ofxGSTTTranscriptor(transcriptorId);
+		nextTranscriber = new ofxGSTTTranscriptor(transcriptorId,&events);
 		transcriber.push_back(nextTranscriber);
 	}
 
