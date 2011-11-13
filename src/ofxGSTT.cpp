@@ -134,7 +134,7 @@ void ofxGSTT::prepareRecording(){
 
 	outfile = sf_open(filename, SFM_WRITE, &info) ;
 	if (!outfile){
-		ofLog(OF_LOG_ERROR,"CANT OPEN FILE");//TODO msg
+		ofLog(OF_LOG_ERROR,"CANT OPEN FILE");
 	}else{
 		bRecordingBlocked = false;
 	}

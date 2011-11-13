@@ -41,6 +41,7 @@ void ofxGSTTTranscriptionThread::stopTranscription() {
 
 void ofxGSTTTranscriptionThread::threadedFunction() {
 	if (!isEncoded) {
+		//encode with libFlac
 		isEncoded = encodeToFlac();
 		if (!isEncoded) {
 			ofLog(OF_LOG_ERROR, "ENCODING FAILD");
@@ -133,7 +134,7 @@ bool ofxGSTTTranscriptionThread::encodeToFlac() {
 			|| memcmp(buffer + 8, "WAVEfmt \020\000\000\000\001\000\002\000", 16)
 			|| memcmp(buffer + 32, "\004\000\020\000data", 8)) {
 		ofLog(OF_LOG_ERROR,
-				"invalid/unsupported WAVE file, only 16bps stereo WAVE in canonical form allowed"); //TODO use ofLog
+				"invalid/unsupported WAVE file, only 16bps stereo WAVE in canonical form allowed");
 		fclose(fin);
 		return false;
 	}
@@ -145,9 +146,9 @@ bool ofxGSTTTranscriptionThread::encodeToFlac() {
 	total_samples = (((((((unsigned) buffer[43] << 8) | buffer[42]) << 8) | buffer[41]) << 8)
 			| buffer[40]) / 4;
 
-	/* allocate the encoder */
+	// allocate the encoder
 	if ((encoder = FLAC__stream_encoder_new()) == NULL) {
-		fprintf(stderr, "ERROR: allocating encoder\n"); //TODO use ofLog
+		ofLog(OF_LOG_ERROR, " allocating encoder\n");
 		fclose(fin);
 		return false;
 	}
@@ -159,14 +160,12 @@ bool ofxGSTTTranscriptionThread::encodeToFlac() {
 	ok &= FLAC__stream_encoder_set_sample_rate(encoder, sample_rate);
 	ok &= FLAC__stream_encoder_set_total_samples_estimate(encoder, total_samples);
 
-	/* initialize encoder */
+	// initialize encoder
 	if (ok) {
-		init_status = FLAC__stream_encoder_init_file(encoder, flacFile, /*progress_callback*/NULL, /*client_data=*/
-		NULL); //TODO progress callback
+		init_status = FLAC__stream_encoder_init_file(encoder, flacFile, NULL, NULL);
 		if (init_status != FLAC__STREAM_ENCODER_INIT_STATUS_OK) {
-			fprintf(stderr,
-					"ERROR: initializing encoder: %s\n",
-					FLAC__StreamEncoderInitStatusString[init_status]); //TODO use ofLog
+			ofLog(OF_LOG_ERROR,	"initializing encoder: ");
+			ofLog(OF_LOG_ERROR, FLAC__StreamEncoderInitStatusString[init_status]);
 			ok = false;
 		}
 	}
@@ -178,7 +177,7 @@ bool ofxGSTTTranscriptionThread::encodeToFlac() {
 		while (ok && left) {
 			size_t need = (left > READSIZE ? (size_t) READSIZE : (size_t) left);
 			if (fread(buffer, channels * (bps / 8), need, fin) != need) {
-				fprintf(stderr, "ERROR: reading from WAVE file\n"); //TODO use ofLog
+				ofLog(OF_LOG_ERROR, "reading from WAVE file");
 				ok = false;
 			} else {
 				/* convert the packed little-endian 16-bit PCM samples from WAVE into an interleaved FLAC__int32 buffer for libFLAC */
@@ -197,31 +196,13 @@ bool ofxGSTTTranscriptionThread::encodeToFlac() {
 
 	ok &= FLAC__stream_encoder_finish(encoder);
 
-	fprintf(stderr, "encoding: %s\n", ok ? "succeeded" : "FAILED"); //TODO use ofLog
+	fprintf(stderr, "encoding: %s\n", ok ? "succeeded" : "FAILED");
 	fprintf(stderr,
 			"   state: %s\n",
-			FLAC__StreamEncoderStateString[FLAC__stream_encoder_get_state(encoder)]); //TODO use ofLog
+			FLAC__StreamEncoderStateString[FLAC__stream_encoder_get_state(encoder)]);
 
 	FLAC__stream_encoder_delete(encoder);
 	fclose(fin);
 
 	return ok;
-}
-
-void ofxGSTTTranscriptionThread::progress_callback(const FLAC__StreamEncoder *encoder,
-		FLAC__uint64 bytes_written, FLAC__uint64 samples_written, unsigned frames_written,
-		unsigned total_frames_estimate, void *client_data) {
-	(void) encoder, (void) client_data;
-
-#ifdef _MSC_VER
-	fprintf(stderr, "wrote %I64u bytes, %I64u/%u samples, %u/%u frames\n", bytes_written, samples_written, total_samples, frames_written, total_frames_estimate);
-#else
-	fprintf(stderr,
-			"wrote %llu bytes, %llu/%u samples, %u/%u frames\n",
-			bytes_written,
-			samples_written,
-			total_samples,
-			frames_written,
-			total_frames_estimate);
-#endif
 }
