@@ -1,83 +1,73 @@
-#include "ofxGSTTTranscriptor.h"
+#include "ofxGSTTTranscriptionThread.h"
 
-
-ofxGSTTTranscriptor::ofxGSTTTranscriptor(int id,ofxGSTTEvents * events) :
+ofxGSTTTranscriptionThread::ofxGSTTTranscriptionThread(int id) :
 		ofThread() {
 	this->id = id;
 	this->bFinished = false;
 	this->isEncoded = false;
 	this->bFree = true;
-	this->events = events;
-	total_samples = 0; //TODO sinn hier
+	total_samples = 0;
 }
 
-void ofxGSTTTranscriptor::setFilename(char * _filename) {
+void ofxGSTTTranscriptionThread::setFilename(char * _filename) {
 	ofLog(OF_LOG_VERBOSE, "set filename: %s", _filename);
-//	memcpy(wavFile, _filename, strlen(_filename));
 	sprintf(flacFile, "%s.flac", _filename);
 	sprintf(wavFile, "%s.wav", _filename);
 }
 
-bool ofxGSTTTranscriptor::isFree() {
+bool ofxGSTTTranscriptionThread::isFree() {
 	return bFree;
 }
 
-void ofxGSTTTranscriptor::reserve() {
+void ofxGSTTTranscriptionThread::reserve() {
 	bFree = false;
 }
 
-bool ofxGSTTTranscriptor::isFinished() {
+bool ofxGSTTTranscriptionThread::isFinished() {
 	return bFinished;
 }
 
-void ofxGSTTTranscriptor::startTranscription() {
+void ofxGSTTTranscriptionThread::startTranscription() {
 	ofLog(OF_LOG_VERBOSE, "start transcription");
 	isEncoded = false;
 	startThread();
 }
 
-void ofxGSTTTranscriptor::stopTranscribing() {
-	//TODO
+void ofxGSTTTranscriptionThread::stopTranscription() {
+	ofLog(OF_LOG_VERBOSE, "start transcription");
 	bFinished = true;
+	stopThread();
 }
 
-void ofxGSTTTranscriptor::threadedFunction() {
-	//loop while thread is running
-//	while (isThreadRunning() == true) {
-	ofLog(OF_LOG_VERBOSE, "run");
+void ofxGSTTTranscriptionThread::threadedFunction() {
+	if (!isEncoded) {
+		isEncoded = encodeToFlac();
 		if (!isEncoded) {
-
-			isEncoded = encodeToFlac();
-			if (!isEncoded) {
-				threadRunning = false;//TODON revisit
-			}
+			ofLog(OF_LOG_ERROR, "ENCODING FAILD");
+			threadRunning = false;
+			return;
 		}
-		if (isEncoded) {
-			//transcribe via google
-			flacToGoogle();
-			bFinished = true;
-			bFree = true;
-
-			  ofxGSTTResponseArgs response;
-			  response.tSend = 0;
-//			  ofNotifyEvent(ofEvents.gsttApiResponseEvent, response,&ofEvents); //das hat funktioniert
-//			  ofNotifyEvent(blablaevent.gsttApiResponseEvent, response,&ofEvents); //das hat funktioniert
-		}
-//	}
+	}
+	if (isEncoded) {
+		//transcribe via google
+		flacToGoogle();
+		bFinished = true;
+		bFree = true;
+	}
 }
 
-bool ofxGSTTTranscriptor::flacToGoogle() {
+bool ofxGSTTTranscriptionThread::flacToGoogle() {
+	ofLog(OF_LOG_VERBOSE, "send flac to google");
 	CURL *curl;
 	CURLcode res;
 
 	struct curl_httppost *formpost = NULL;
 	struct curl_httppost *lastptr = NULL;
 	struct curl_slist *headerlist = NULL;
-	static const char buf[] = "Expect:";
 
 	curl_global_init(CURL_GLOBAL_ALL);
 
-	/* Fill in the file upload field */
+	// set form
 	curl_formadd(&formpost,
 			&lastptr,
 			CURLFORM_COPYNAME,
@@ -89,27 +79,26 @@ bool ofxGSTTTranscriptor::flacToGoogle() {
 			CURLFORM_END);
 
 	curl = curl_easy_init();
-	/* initalize custom header list (stating that Expect: 100-continue is not
-	 wanted */
-	headerlist = curl_slist_append(headerlist, buf);
+
+	// set header
+	headerlist = curl_slist_append(headerlist, "Expect:");
 	headerlist = curl_slist_append(headerlist, "Content-Type: audio/x-flac; rate=16000");
 	if (curl) {
-		/* what URL that receives this POST */
+		//set options
 		curl_easy_setopt(curl,
 				CURLOPT_URL,
 				"https://www.google.com/speech-api/v1/recognize?xjerr=1&client=chromium&lang=de-de");
 		curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headerlist);
 		curl_easy_setopt(curl, CURLOPT_HTTPPOST, formpost);
 
-		extraData data;
+		//set callback function and callback data for the https response
+		callBackData data;
 		data.id = id;
 		data.timestamp = ofGetSystemTime();
-		data.events = events;
-
 		curl_easy_setopt(curl, CURLOPT_WRITEDATA, &data);
 		curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, writeResponseFunc);
 
-
+		//submit form
 		res = curl_easy_perform(curl);
 
 		//cleanup
@@ -123,7 +112,7 @@ bool ofxGSTTTranscriptor::flacToGoogle() {
 	}
 }
 
-bool ofxGSTTTranscriptor::encodeToFlac() {
+bool ofxGSTTTranscriptionThread::encodeToFlac() {
 	ofLog(OF_LOG_VERBOSE, "init encoding");
 	FLAC__bool ok = true;
 	FLAC__StreamEncoder *encoder = 0;
@@ -139,12 +128,12 @@ bool ofxGSTTTranscriptor::encodeToFlac() {
 		return false;
 	}
 
-	/* read wav header and validate it */
+	// read and validate wav header
 	if (fread(buffer, 1, 44, fin) != 44 || memcmp(buffer, "RIFF", 4)
 			|| memcmp(buffer + 8, "WAVEfmt \020\000\000\000\001\000\002\000", 16)
 			|| memcmp(buffer + 32, "\004\000\020\000data", 8)) {
-		fprintf(stderr,
-				"ERROR: invalid/unsupported WAVE file, only 16bps stereo WAVE in canonical form allowed\n"); //TODO use ofLog
+		ofLog(OF_LOG_ERROR,
+				"invalid/unsupported WAVE file, only 16bps stereo WAVE in canonical form allowed"); //TODO use ofLog
 		fclose(fin);
 		return false;
 	}
@@ -219,7 +208,7 @@ bool ofxGSTTTranscriptor::encodeToFlac() {
 	return ok;
 }
 
-void ofxGSTTTranscriptor::progress_callback(const FLAC__StreamEncoder *encoder,
+void ofxGSTTTranscriptionThread::progress_callback(const FLAC__StreamEncoder *encoder,
 		FLAC__uint64 bytes_written, FLAC__uint64 samples_written, unsigned frames_written,
 		unsigned total_frames_estimate, void *client_data) {
 	(void) encoder, (void) client_data;

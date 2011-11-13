@@ -12,49 +12,41 @@
 
 #define READSIZE 1024
 
-
-struct extraData{
+struct callBackData{
 	int id;
 	long timestamp;
-	ofxGSTTEvents * events;
 };
 
-static size_t writeResponseFunc(void *ptr, size_t size, size_t nmemb, extraData * data)
+//callback function for curl response
+static size_t writeResponseFunc(void *ptr, size_t size, size_t nmemb, callBackData * data)
 {
-  char jsonLine[1024];
-  size_t cpySize = size*nmemb;
-  if(cpySize > 1024){
-	  cpySize =  1024;
-  }
-  memcpy(jsonLine, ptr, size*nmemb);
-  printf("ID: %i ANTWORT: %s",data->id,jsonLine);
-
-  //EVENT MESS
   ofxGSTTResponseArgs response;
   response.threadId = data->id;
   response.tSend = data->timestamp;
   response.tReceived = ofGetSystemTime();
-//TODO json -> string
 
+  //decode via json
   googleResponseParser parser;
   parser.parseJSON((char*)ptr);
+
   response.msg = parser.utterance;
   response.confidence = parser.confidence;
-  ofNotifyEvent(data->events->gsttApiResponseEvent, response);
+  response.status = parser.status;
+
+  ofNotifyEvent(gsttApiResponseEvent, response);
+
   return size*nmemb;
 }
 
-static size_t writeResponseFunc(void *ptr, size_t size, size_t nmemb, extraData * data);
-
-class ofxGSTTTranscriptor : protected ofThread{
+class ofxGSTTTranscriptionThread : protected ofThread{
 public:
-	ofxGSTTTranscriptor(int id,ofxGSTTEvents * events);
-	virtual ~ofxGSTTTranscriptor(){ }
+	ofxGSTTTranscriptionThread(int id);
+	virtual ~ofxGSTTTranscriptionThread(){ }
 
 	void setFilename(char filename[]);
 
 	void startTranscription();
-	void stopTranscribing();
+	void stopTranscription();
 	void reserve();
 	bool isFree();
 	bool isFinished();
@@ -68,7 +60,6 @@ protected:
 	bool bFinished;
 	bool isEncoded;
 	bool bFree;
-	ofxGSTTEvents * events;
 
 	virtual void threadedFunction();
 

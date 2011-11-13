@@ -1,3 +1,8 @@
+/***
+ * Class to decode Googles response via jansson
+ */
+
+
 #ifndef _RESPONSEPARSER_H_
 #define _RESPONSEPARSER_H_
 

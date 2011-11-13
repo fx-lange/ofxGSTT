@@ -1,32 +1,52 @@
 #include "ofxGSTT.h"
 
-ofxGSTT::ofxGSTT(ofBaseApp * baseApp){
+ofxGSTT::ofxGSTT(){
+	bListen = false;
+	bActiveVolume = false;
+	bRecording = false;
+	bRecordingBlocked = true;
+	timerRecording.setup(500,false);
+	volumeThreshold = 0.f;
+	transcriptorId = 0;
+}
+
+void ofxGSTT::setup(int sampleRate, float _volumeThreshold){
 	/*** SOUND INPUT ***/
 	sampleRate = 16000;
 	bufferSize = 256;
 	left.assign(bufferSize, 0.0);
 	right.assign(bufferSize, 0.0);
 	smoothedVol     = 0.0;
-	scaledVol		= 0.0;
-	soundStream.setup(baseApp, 0, 2, sampleRate, bufferSize, 4);
 
 	/*** SOUND RECORDING ***/
-	bActiveVolume = false;
-	bRecording = false;
-	bRecordingBlocked = true;
-	timerRecording.setup(500,false);
-	soundThreshold = 0.f;
-	transcriptorId = 0;
-
 	info.format=SF_FORMAT_WAV | SF_FORMAT_PCM_16;
-	info.frames = sampleRate*60;
+	info.frames = sampleRate*60; //TODO revisit -> why *60? because of 60fps?
 	info.samplerate = sampleRate;
 	info.channels = 2;
+	volumeThreshold = _volumeThreshold;
+
+	ofDirectory dir;
+	if(!dir.doesDirectoryExist("tmpAudio")){
+		dir.createDirectory("tmpAudio");
+	}
 
 	prepareRecording();
-
 	ofAddListener(ofEvents.audioReceived,this,&ofxGSTT::audioIn);
-}//TODO extra setup function
+	bListen = true;
+}
+
+void ofxGSTT::setListening(bool listen){
+	if(listen == bListen){
+		return; //nothing to change/do
+	}else{
+		if(listen){
+			ofAddListener(ofEvents.audioReceived,this,&ofxGSTT::audioIn);
+		}else{
+			ofRemoveListener(ofEvents.audioReceived,this,&ofxGSTT::audioIn);
+		}
+		bListen = listen;
+	}
+}
 
 bool ofxGSTT::isRecording(){
 	return bRecording;
@@ -62,13 +82,12 @@ void ofxGSTT::audioIn(ofAudioEventArgs& event){
 	smoothedVol += 0.1 * curVol;
 
 	//lets scale the vol up to a 0-1 range
-	scaledVol = ofMap(smoothedVol, 0.0, 0.17, 0.0, 1.0, true);
-	float scaleCurVolume = ofMap(curVol, 0.0, 0.17, 0.0, 1.0, true);
-//	cout << "Volume: cur: " << curVol << "smooth: " << curVol << "scaled: " << curVol << endl;
+	float scaledVol = ofMap(smoothedVol, 0.0, 0.17, 0.0, 1.0, true);
+	float scaledCurVolume = ofMap(curVol, 0.0, 0.17, 0.0, 1.0, true);
 
-	bool bActiveVolume = scaleCurVolume > soundThreshold;
+	bool bActiveVolume = scaledCurVolume > volumeThreshold;
 
-	//TODO should be in an extra update function?!
+	//TODO revisit: should be in an extra update function?!
 	if(bActiveVolume){
 		timerRecording.reset();
 		timerRecording.startTimer();
@@ -87,34 +106,33 @@ void ofxGSTT::audioIn(ofAudioEventArgs& event){
 
 void ofxGSTT::prepareRecording(){
 	ofLog(OF_LOG_VERBOSE,"prepare recording");
-	ofxGSTTTranscriptor * nextTranscriber = NULL;
+	ofxGSTTTranscriptionThread * nextTranscriber = NULL;
 	transcriptorId = 0;
 	for(int i=0;i<transcriber.size();++i){
-		ofxGSTTTranscriptor * tmpTranscriber = transcriber[i];
+		ofxGSTTTranscriptionThread * tmpTranscriber = transcriber[i];
 		if(tmpTranscriber->isFree()){
-			ofLog(OF_LOG_VERBOSE,"free transcriber found");
+			ofLog(OF_LOG_VERBOSE,"free transciptor found");
 			transcriptorId = i;
 			nextTranscriber = tmpTranscriber;
 			break;
 		}
 	}
 
-	//new one if nothing is free
+	//create new one if nothing is free
 	if(nextTranscriber==NULL){
-		ofLog(OF_LOG_VERBOSE,"all transcribers reserved -> create new one");
+		ofLog(OF_LOG_VERBOSE,"no transciptor free -> create new one");
 		transcriptorId = transcriber.size();
-		nextTranscriber = new ofxGSTTTranscriptor(transcriptorId,&events);
+		nextTranscriber = new ofxGSTTTranscriptionThread(transcriptorId);
 		transcriber.push_back(nextTranscriber);
 	}
 
-
 	char filename[32];
-	sprintf(filename,"data/tmpaudio%i",transcriptorId);
+	sprintf(filename,"data/tmpAudio/%i",transcriptorId);
 	nextTranscriber->setFilename(filename);
 	nextTranscriber->reserve();
 	sprintf(filename,"%s.wav",filename);
-	outfile = sf_open(filename, SFM_WRITE, &info) ;
 
+	outfile = sf_open(filename, SFM_WRITE, &info) ;
 	if (!outfile){
 		ofLog(OF_LOG_ERROR,"CANT OPEN FILE");//TODO msg
 	}else{

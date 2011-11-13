@@ -2,43 +2,38 @@
 #define _STTG_H_
 
 #include "ofMain.h"
-#include "ofxGSTTTranscriptor.h"
+#include "ofxGSTTTranscriptionThread.h"
 #include "ofxTimer.h"
 #include "sndfile.h"
 
 
-
 class ofxGSTT{
 public:
-	ofxGSTT(ofBaseApp * baseApp);
+	ofxGSTT();
 
-	void setup();
+	void setup(int sampleRate, float _volumeThreshold = 0.05);
+	void setListening(bool listen=true);
 
 	bool isRecording();
 
 	void audioIn(ofAudioEventArgs & event);
 
-	ofxGSTTEvents events;
-
 	//GUI settings
-	float soundThreshold;
+	float volumeThreshold;
 
 protected:
-
 	void prepareRecording();
 	void finishRecording();
 
-	vector<ofxGSTTTranscriptor*> transcriber;
+	vector<ofxGSTTTranscriptionThread*> transcriber;
 
 	/*** SOUND INPUT ***/
 	int bufferSize;
 	int sampleRate;
 	vector <float> left;
 	vector <float> right;
-
 	float smoothedVol;
-	float scaledVol;
-	ofSoundStream soundStream;
+	bool bListen;
 
 	/*** SOUND RECORDING ***/
 	bool bActiveVolume;
