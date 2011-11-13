@@ -18,30 +18,30 @@ struct callBackData{
 };
 
 //callback function for curl response
-static size_t writeResponseFunc(void *ptr, size_t size, size_t nmemb, callBackData * data)
-{
-  ofxGSTTResponseArgs response;
-  response.threadId = data->id;
-  response.tSend = data->timestamp;
-  response.tReceived = ofGetSystemTime();
+static size_t writeResponseFunc(void *ptr, size_t size, size_t nmemb, callBackData * data){
+	ofxGSTTResponseArgs response;
+	response.threadId = data->id;
+	response.tSend = data->timestamp;
+	response.tReceived = ofGetSystemTime();
 
-  //decode via json
-  googleResponseParser parser;
-  parser.parseJSON((char*)ptr);
+	//decode via json
+	googleResponseParser parser;
+	parser.parseJSON((char*) ptr);
 
-  response.msg = parser.utterance;
-  response.confidence = parser.confidence;
-  response.status = parser.status;
+	response.msg = parser.utterance;
+	response.confidence = parser.confidence;
+	response.status = parser.status;
 
-  ofNotifyEvent(gsttApiResponseEvent, response);
+	ofNotifyEvent(gsttApiResponseEvent, response);
 
-  return size*nmemb;
+	return size * nmemb;
 }
 
-class ofxGSTTTranscriptionThread : protected ofThread{
+class ofxGSTTTranscriptionThread: protected ofThread{
 public:
 	ofxGSTTTranscriptionThread(int id);
-	virtual ~ofxGSTTTranscriptionThread(){ }
+	virtual ~ofxGSTTTranscriptionThread(){
+	}
 
 	void setFilename(char filename[]);
 
@@ -67,13 +67,13 @@ protected:
 
 	bool encodeToFlac();
 	//ENCODE TO FLAC STUFF
-	void progress_callback(const FLAC__StreamEncoder *encoder, FLAC__uint64 bytes_written, FLAC__uint64 samples_written, unsigned frames_written, unsigned total_frames_estimate, void *client_data);
+	void progress_callback(const FLAC__StreamEncoder *encoder, FLAC__uint64 bytes_written,
+			FLAC__uint64 samples_written, unsigned frames_written, unsigned total_frames_estimate,
+			void *client_data);
 
 	unsigned total_samples; /* can use a 32-bit number due to WAVE size limitations */
-	FLAC__byte buffer[READSIZE/*samples*/ * 2/*bytes_per_sample*/ * 2/*channels*/]; /* we read the WAVE data into here */
-	FLAC__int32 pcm[READSIZE/*samples*/ * 2/*channels*/];
+	FLAC__byte buffer[READSIZE/*samples*/* 2/*bytes_per_sample*/* 2/*channels*/]; /* we read the WAVE data into here */
+FLAC__int32	pcm[READSIZE/*samples*/* 2/*channels*/];
 };
-
-
 
 #endif

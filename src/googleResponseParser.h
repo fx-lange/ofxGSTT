@@ -2,13 +2,11 @@
  * Class to decode Googles response via jansson
  */
 
-
 #ifndef _RESPONSEPARSER_H_
 #define _RESPONSEPARSER_H_
 
 #include "ofMain.h"
 #include "jansson.h"
-
 
 class googleResponseParser{
 public:
@@ -25,7 +23,7 @@ public:
 
 		// load json.
 		root = json_loads(jsonLine, 0, &error);
-		if(!root) {
+		if(!root){
 			ofLog(OF_LOG_ERROR, "error: on jsonLine:%d %s", error.line, error.text);
 			return;
 		}
@@ -33,13 +31,13 @@ public:
 		json_unpack(root, "{s:o}", "hypotheses", &hypotheses);
 
 		result = json_object_get(root, "status");
-		if(!json_is_integer(result)) {
+		if(!json_is_integer(result)){
 			ofLog(OF_LOG_ERROR, "error: cannot get status from json");
 			return;
 		}
 		status = json_integer_value(result);
-		if(status==0){
-			if(json_array_size(hypotheses)>0){
+		if(status == 0){
+			if(json_array_size(hypotheses) > 0){
 				result = json_array_get(hypotheses, 0);
 				parseGoogleJSON(result);
 			}else{
@@ -51,12 +49,12 @@ public:
 		delete root;
 	}
 private:
-	void parseGoogleJSON(json_t*& root) {
+	void parseGoogleJSON(json_t*& root){
 		json_error_t error;
 
 		// utterance
-		json_t* node =	json_object_get(root, "utterance");
-		if(!json_is_string(node)) {
+		json_t* node = json_object_get(root, "utterance");
+		if(!json_is_string(node)){
 			ofLog(OF_LOG_ERROR, "error: cannot get utterance from response");
 			return;
 		}
@@ -64,7 +62,7 @@ private:
 
 		// confidence
 		node = json_object_get(root, "confidence");
-		if(!json_is_real(node)) {
+		if(!json_is_real(node)){
 			ofLog(OF_LOG_ERROR, "error: cannot get confidence from response");
 			return;
 		}

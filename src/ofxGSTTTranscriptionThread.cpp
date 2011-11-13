@@ -1,7 +1,7 @@
 #include "ofxGSTTTranscriptionThread.h"
 
 ofxGSTTTranscriptionThread::ofxGSTTTranscriptionThread(int id) :
-		ofThread() {
+		ofThread(){
 	this->id = id;
 	this->bFinished = false;
 	this->isEncoded = false;
@@ -9,47 +9,47 @@ ofxGSTTTranscriptionThread::ofxGSTTTranscriptionThread(int id) :
 	total_samples = 0;
 }
 
-void ofxGSTTTranscriptionThread::setFilename(char * _filename) {
+void ofxGSTTTranscriptionThread::setFilename(char * _filename){
 	ofLog(OF_LOG_VERBOSE, "set filename: %s", _filename);
 	sprintf(flacFile, "%s.flac", _filename);
 	sprintf(wavFile, "%s.wav", _filename);
 }
 
-bool ofxGSTTTranscriptionThread::isFree() {
+bool ofxGSTTTranscriptionThread::isFree(){
 	return bFree;
 }
 
-void ofxGSTTTranscriptionThread::reserve() {
+void ofxGSTTTranscriptionThread::reserve(){
 	bFree = false;
 }
 
-bool ofxGSTTTranscriptionThread::isFinished() {
+bool ofxGSTTTranscriptionThread::isFinished(){
 	return bFinished;
 }
 
-void ofxGSTTTranscriptionThread::startTranscription() {
+void ofxGSTTTranscriptionThread::startTranscription(){
 	ofLog(OF_LOG_VERBOSE, "start transcription");
 	isEncoded = false;
 	startThread();
 }
 
-void ofxGSTTTranscriptionThread::stopTranscription() {
+void ofxGSTTTranscriptionThread::stopTranscription(){
 	ofLog(OF_LOG_VERBOSE, "start transcription");
 	bFinished = true;
 	stopThread();
 }
 
-void ofxGSTTTranscriptionThread::threadedFunction() {
-	if (!isEncoded) {
+void ofxGSTTTranscriptionThread::threadedFunction(){
+	if(!isEncoded){
 		//encode with libFlac
 		isEncoded = encodeToFlac();
-		if (!isEncoded) {
+		if(!isEncoded){
 			ofLog(OF_LOG_ERROR, "ENCODING FAILD");
 			threadRunning = false;
 			return;
 		}
 	}
-	if (isEncoded) {
+	if(isEncoded){
 		//transcribe via google
 		flacToGoogle();
 		bFinished = true;
@@ -57,7 +57,7 @@ void ofxGSTTTranscriptionThread::threadedFunction() {
 	}
 }
 
-bool ofxGSTTTranscriptionThread::flacToGoogle() {
+bool ofxGSTTTranscriptionThread::flacToGoogle(){
 	ofLog(OF_LOG_VERBOSE, "send flac to google");
 	CURL *curl;
 	CURLcode res;
@@ -84,7 +84,7 @@ bool ofxGSTTTranscriptionThread::flacToGoogle() {
 	// set header
 	headerlist = curl_slist_append(headerlist, "Expect:");
 	headerlist = curl_slist_append(headerlist, "Content-Type: audio/x-flac; rate=16000");
-	if (curl) {
+	if(curl){
 		//set options
 		curl_easy_setopt(curl,
 				CURLOPT_URL,
@@ -107,13 +107,13 @@ bool ofxGSTTTranscriptionThread::flacToGoogle() {
 		curl_formfree(formpost);
 		curl_slist_free_all(headerlist);
 		return true;
-	} else {
+	}else{
 		ofLog(OF_LOG_ERROR, "google request failed");
 		return false;
 	}
 }
 
-bool ofxGSTTTranscriptionThread::encodeToFlac() {
+bool ofxGSTTTranscriptionThread::encodeToFlac(){
 	ofLog(OF_LOG_VERBOSE, "init encoding");
 	FLAC__bool ok = true;
 	FLAC__StreamEncoder *encoder = 0;
@@ -124,15 +124,15 @@ bool ofxGSTTTranscriptionThread::encodeToFlac() {
 	unsigned channels = 0;
 	unsigned bps = 0;
 
-	if ((fin = fopen(wavFile, "rb")) == NULL) {
+	if((fin = fopen(wavFile, "rb")) == NULL){
 		ofLog(OF_LOG_ERROR, "ERROR: opening %s for output\n", wavFile);
 		return false;
 	}
 
 	// read and validate wav header
-	if (fread(buffer, 1, 44, fin) != 44 || memcmp(buffer, "RIFF", 4)
+	if(fread(buffer, 1, 44, fin) != 44 || memcmp(buffer, "RIFF", 4)
 			|| memcmp(buffer + 8, "WAVEfmt \020\000\000\000\001\000\002\000", 16)
-			|| memcmp(buffer + 32, "\004\000\020\000data", 8)) {
+			|| memcmp(buffer + 32, "\004\000\020\000data", 8)){
 		ofLog(OF_LOG_ERROR,
 				"invalid/unsupported WAVE file, only 16bps stereo WAVE in canonical form allowed");
 		fclose(fin);
@@ -147,7 +147,7 @@ bool ofxGSTTTranscriptionThread::encodeToFlac() {
 			| buffer[40]) / 4;
 
 	// allocate the encoder
-	if ((encoder = FLAC__stream_encoder_new()) == NULL) {
+	if((encoder = FLAC__stream_encoder_new()) == NULL){
 		ofLog(OF_LOG_ERROR, " allocating encoder\n");
 		fclose(fin);
 		return false;
@@ -161,10 +161,10 @@ bool ofxGSTTTranscriptionThread::encodeToFlac() {
 	ok &= FLAC__stream_encoder_set_total_samples_estimate(encoder, total_samples);
 
 	// initialize encoder
-	if (ok) {
+	if(ok){
 		init_status = FLAC__stream_encoder_init_file(encoder, flacFile, NULL, NULL);
-		if (init_status != FLAC__STREAM_ENCODER_INIT_STATUS_OK) {
-			ofLog(OF_LOG_ERROR,	"initializing encoder: ");
+		if(init_status != FLAC__STREAM_ENCODER_INIT_STATUS_OK){
+			ofLog(OF_LOG_ERROR, "initializing encoder: ");
 			ofLog(OF_LOG_ERROR, FLAC__StreamEncoderInitStatusString[init_status]);
 			ok = false;
 		}
@@ -172,17 +172,17 @@ bool ofxGSTTTranscriptionThread::encodeToFlac() {
 
 	ofLog(OF_LOG_VERBOSE, "start encoding");
 	/* read blocks of samples from WAVE file and feed to encoder */
-	if (ok) {
+	if(ok){
 		size_t left = (size_t) total_samples;
-		while (ok && left) {
+		while(ok && left){
 			size_t need = (left > READSIZE ? (size_t) READSIZE : (size_t) left);
-			if (fread(buffer, channels * (bps / 8), need, fin) != need) {
+			if(fread(buffer, channels * (bps / 8), need, fin) != need){
 				ofLog(OF_LOG_ERROR, "reading from WAVE file");
 				ok = false;
-			} else {
+			}else{
 				/* convert the packed little-endian 16-bit PCM samples from WAVE into an interleaved FLAC__int32 buffer for libFLAC */
 				size_t i;
-				for (i = 0; i < need * channels; i++) {
+				for(i = 0; i < need * channels; i++){
 					/* inefficient but simple and works on big- or little-endian machines */
 					pcm[i] = (FLAC__int32) (((FLAC__int16) (FLAC__int8) buffer[2 * i + 1] << 8)
 							| (FLAC__int16) buffer[2 * i]);

@@ -6,13 +6,12 @@
 #include "ofxTimer.h"
 #include "sndfile.h"
 
-
 class ofxGSTT{
 public:
 	ofxGSTT();
 
 	void setup(int sampleRate, float _volumeThreshold = 0.05);
-	void setListening(bool listen=true);
+	void setListening(bool listen = true);
 
 	bool isRecording();
 
@@ -30,8 +29,8 @@ protected:
 	/*** SOUND INPUT ***/
 	int bufferSize;
 	int sampleRate;
-	vector <float> left;
-	vector <float> right;
+	vector<float> left;
+	vector<float> right;
 	float smoothedVol;
 	bool bListen;
 

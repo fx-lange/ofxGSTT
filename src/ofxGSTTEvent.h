@@ -7,7 +7,7 @@
 
 #include "ofMain.h"
 
-class ofxGSTTResponseArgs: public ofEventArgs {
+class ofxGSTTResponseArgs: public ofEventArgs{
 public:
 	ofxGSTTResponseArgs(){
 		threadId = 0;
