@@ -12,6 +12,8 @@ class ofxGSTT{
 public:
 	ofxGSTT(ofBaseApp * baseApp);
 
+	void setup();
+
 	bool isRecording();
 
 	void audioIn(ofAudioEventArgs & event);

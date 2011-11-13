@@ -24,7 +24,7 @@ ofxGSTT::ofxGSTT(ofBaseApp * baseApp){
 	info.channels = 2;
 
 	prepareRecording();
-	ofSetLogLevel(OF_LOG_VERBOSE);
+
 	ofAddListener(ofEvents.audioReceived,this,&ofxGSTT::audioIn);
 }//TODO extra setup function
 

@@ -1,5 +1,8 @@
-#include "jansson.h"
+#ifndef _RESPONSEPARSER_H_
+#define _RESPONSEPARSER_H_
+
 #include "ofMain.h"
+#include "jansson.h"
 
 
 class googleResponseParser{
@@ -63,3 +66,5 @@ private:
 		confidence = json_real_value(node);
 	}
 };
+
+#endif

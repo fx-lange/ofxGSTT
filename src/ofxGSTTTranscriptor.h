@@ -4,6 +4,7 @@
 #include "ofMain.h"
 #include "ofThread.h"
 #include "googleResponseParser.h"
+#include "ofxGSTTEvent.h"
 
 #include "FLAC/metadata.h"
 #include "FLAC/stream_encoder.h"
@@ -11,21 +12,6 @@
 
 #define READSIZE 1024
 
-
-class ofxGSTTResponseArgs : public ofEventArgs{
-  public:
-	int threadId;
-	long tSend;
-	long tReceived;
-	int source;
-	string msg;
-	float confidence;
-};
-
-class ofxGSTTEvents{
-public:
-	ofEvent<ofxGSTTResponseArgs> gsttApiResponseEvent;
-};
 
 struct extraData{
 	int id;
