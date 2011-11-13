@@ -11,3 +11,4 @@ Dependencies:
 sndfile - recording audio to wav
 libFlac - encoding wav to flac
 libcUrl - sending flac file via https to the inofficial google stt api
+jansson - json c lib
