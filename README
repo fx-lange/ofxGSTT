@@ -1,6 +1,6 @@
 ofxGSTT is an openFrameworks addon / wrapper to the inofficial google speech to text api
 
-first version should be ready this weekend
+the first prototype is finished. have a look at the example.
 
 Credits:
 it is ported from the processing library by Florian Schulz (http://stt.getflourish.com/)
