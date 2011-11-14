@@ -39,7 +39,7 @@ void gsttApp::audioIn(float * input, int bufferSize, int nChannels){
 }
 
 void gsttApp::gsttResponse(ofxGSTTResponseArgs & response){
-	cout << "Response: " << response.msg << "with confidence: " << ofToString(response.confidence) << endl;
+	cout << "Response: " << response.msg << endl << "with confidence: " << ofToString(response.confidence) << endl;
 	if(response.msg != ""){
 		responseStr += response.msg + "\n";
 	}
