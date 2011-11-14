@@ -1,8 +1,9 @@
 #include "ofxGSTTTranscriptionThread.h"
 
-ofxGSTTTranscriptionThread::ofxGSTTTranscriptionThread(int id) :
+ofxGSTTTranscriptionThread::ofxGSTTTranscriptionThread(int id, string language) :
 		ofThread(){
 	this->id = id;
+	this->url = "https://www.google.com/speech-api/v1/recognize?xjerr=1&client=chromium&lang="+language;
 	this->bFinished = false;
 	this->isEncoded = false;
 	this->bFree = true;
@@ -30,7 +31,7 @@ bool ofxGSTTTranscriptionThread::isFinished(){
 void ofxGSTTTranscriptionThread::startTranscription(){
 	ofLog(OF_LOG_VERBOSE, "start transcription");
 	isEncoded = false;
-	startThread();
+	startThread(true,false);
 }
 
 void ofxGSTTTranscriptionThread::stopTranscription(){
@@ -88,7 +89,7 @@ bool ofxGSTTTranscriptionThread::flacToGoogle(){
 		//set options
 		curl_easy_setopt(curl,
 				CURLOPT_URL,
-				"https://www.google.com/speech-api/v1/recognize?xjerr=1&client=chromium&lang=de-de");
+				url.c_str());
 		curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headerlist);
 		curl_easy_setopt(curl, CURLOPT_HTTPPOST, formpost);
 
@@ -118,7 +119,6 @@ bool ofxGSTTTranscriptionThread::encodeToFlac(){
 	FLAC__bool ok = true;
 	FLAC__StreamEncoder *encoder = 0;
 	FLAC__StreamEncoderInitStatus init_status;
-	FLAC__StreamMetadata_VorbisComment_Entry entry;
 	FILE *fin;
 	unsigned sample_rate = 0;
 	unsigned channels = 0;
@@ -140,7 +140,6 @@ bool ofxGSTTTranscriptionThread::encodeToFlac(){
 	}
 	sample_rate = ((((((unsigned) buffer[27] << 8) | buffer[26]) << 8) | buffer[25]) << 8)
 			| buffer[24];
-	cout << "SAMPLE RATE: " << sample_rate;
 	channels = 2;
 	bps = 16;
 	total_samples = (((((((unsigned) buffer[43] << 8) | buffer[42]) << 8) | buffer[41]) << 8)
@@ -196,10 +195,10 @@ bool ofxGSTTTranscriptionThread::encodeToFlac(){
 
 	ok &= FLAC__stream_encoder_finish(encoder);
 
-	fprintf(stderr, "encoding: %s\n", ok ? "succeeded" : "FAILED");
-	fprintf(stderr,
-			"   state: %s\n",
-			FLAC__StreamEncoderStateString[FLAC__stream_encoder_get_state(encoder)]);
+//	fprintf(stderr, "encoding: %s\n", ok ? "succeeded" : "FAILED");
+//	fprintf(stderr,
+//			"   state: %s\n",
+//			FLAC__StreamEncoderStateString[FLAC__stream_encoder_get_state(encoder)]);
 
 	FLAC__stream_encoder_delete(encoder);
 	fclose(fin);

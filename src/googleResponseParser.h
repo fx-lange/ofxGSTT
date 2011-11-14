@@ -50,7 +50,6 @@ public:
 	}
 private:
 	void parseGoogleJSON(json_t*& root){
-		json_error_t error;
 
 		// utterance
 		json_t* node = json_object_get(root, "utterance");

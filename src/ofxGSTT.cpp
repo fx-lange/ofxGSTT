@@ -10,7 +10,7 @@ ofxGSTT::ofxGSTT(){
 	transcriptorId = 0;
 }
 
-void ofxGSTT::setup(int sampleRate, float _volumeThreshold){
+void ofxGSTT::setup(int sampleRate,string language, float _volumeThreshold){
 	/*** SOUND INPUT ***/
 	sampleRate = 16000;
 	bufferSize = 256;
@@ -24,6 +24,8 @@ void ofxGSTT::setup(int sampleRate, float _volumeThreshold){
 	info.samplerate = sampleRate;
 	info.channels = 2;
 	volumeThreshold = _volumeThreshold;
+
+	this->language = language;
 
 	ofDirectory dir;
 	if(!dir.doesDirectoryExist("tmpAudio")){
@@ -82,7 +84,7 @@ void ofxGSTT::audioIn(ofAudioEventArgs& event){
 	smoothedVol += 0.1 * curVol;
 
 	//lets scale the vol up to a 0-1 range
-	float scaledVol = ofMap(smoothedVol, 0.0, 0.17, 0.0, 1.0, true);
+	//float scaledVol = ofMap(smoothedVol, 0.0, 0.17, 0.0, 1.0, true);
 	float scaledCurVolume = ofMap(curVol, 0.0, 0.17, 0.0, 1.0, true);
 
 	bool bActiveVolume = scaledCurVolume > volumeThreshold;
@@ -122,7 +124,7 @@ void ofxGSTT::prepareRecording(){
 	if(nextTranscriber == NULL){
 		ofLog(OF_LOG_VERBOSE, "no transciptor free -> create new one");
 		transcriptorId = transcriber.size();
-		nextTranscriber = new ofxGSTTTranscriptionThread(transcriptorId);
+		nextTranscriber = new ofxGSTTTranscriptionThread(transcriptorId,language);
 		transcriber.push_back(nextTranscriber);
 	}
 

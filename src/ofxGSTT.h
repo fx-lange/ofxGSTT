@@ -10,7 +10,7 @@ class ofxGSTT{
 public:
 	ofxGSTT();
 
-	void setup(int sampleRate, float _volumeThreshold = 0.05);
+	void setup(int sampleRate,string language, float _volumeThreshold = 0.05);
 	void setListening(bool listen = true);
 
 	bool isRecording();
@@ -25,6 +25,7 @@ protected:
 	void finishRecording();
 
 	vector<ofxGSTTTranscriptionThread*> transcriber;
+	string language;
 
 	/*** SOUND INPUT ***/
 	int bufferSize;

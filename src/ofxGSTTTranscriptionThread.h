@@ -39,7 +39,7 @@ static size_t writeResponseFunc(void *ptr, size_t size, size_t nmemb, callBackDa
 
 class ofxGSTTTranscriptionThread: protected ofThread{
 public:
-	ofxGSTTTranscriptionThread(int id);
+	ofxGSTTTranscriptionThread(int id, string language);
 	virtual ~ofxGSTTTranscriptionThread(){
 	}
 
@@ -61,19 +61,17 @@ protected:
 	bool isEncoded;
 	bool bFree;
 
+	string url;
+
 	virtual void threadedFunction();
 
 	bool flacToGoogle();
 
 	bool encodeToFlac();
 	//ENCODE TO FLAC STUFF
-	void progress_callback(const FLAC__StreamEncoder *encoder, FLAC__uint64 bytes_written,
-			FLAC__uint64 samples_written, unsigned frames_written, unsigned total_frames_estimate,
-			void *client_data);
-
 	unsigned total_samples; /* can use a 32-bit number due to WAVE size limitations */
 	FLAC__byte buffer[READSIZE/*samples*/* 2/*bytes_per_sample*/* 2/*channels*/]; /* we read the WAVE data into here */
-FLAC__int32	pcm[READSIZE/*samples*/* 2/*channels*/];
+    FLAC__int32	pcm[READSIZE/*samples*/* 2/*channels*/];
 };
 
 #endif
