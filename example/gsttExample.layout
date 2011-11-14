@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_layout_file>
+	<ActiveTarget name="Debug" />
+	<File name="src/gsttApp.cpp" open="1" top="0" tabpos="1">
+		<Cursor position="1205" topLine="6" />
+	</File>
+	<File name="../src/ofxGSTT.cpp" open="1" top="0" tabpos="2">
+		<Cursor position="338" topLine="0" />
+	</File>
+	<File name="../src/ofxGSTTEvent.h" open="1" top="1" tabpos="5">
+		<Cursor position="301" topLine="0" />
+	</File>
+	<File name="../src/ofxGSTTTranscriptionThread.cpp" open="1" top="0" tabpos="4">
+		<Cursor position="1718" topLine="39" />
+	</File>
+	<File name="../src/ofxGSTTTranscriptionThread.h" open="1" top="0" tabpos="3">
+		<Cursor position="0" topLine="0" />
+	</File>
+</CodeBlocks_layout_file>
