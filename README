@@ -10,8 +10,9 @@ which is based on Mike Pultz article (http://mikepultz.com/2011/03/accessing-goo
 that shows how to use the technologie offered by Google without a browser
 
 Dependencies:
-sndfile - recording audio to wav
-libFlac - encoding wav to flac
-libcUrl - sending flac file via https to the inofficial google stt api
-jansson - json c lib
 ofxTimer
+sndfile - recording audio to wav
+libFlac - encoding wav to flac (not included yet)
+libcUrl - sending flac file via https to the inofficial google stt api (not included yet)
+jansson - json c lib (not included yet)
+
