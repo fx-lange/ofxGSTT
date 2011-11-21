@@ -1,13 +1,18 @@
 #include "ofxGSTTTranscriptionThread.h"
 
-ofxGSTTTranscriptionThread::ofxGSTTTranscriptionThread(int id, string language) :
+ofxGSTTTranscriptionThread::ofxGSTTTranscriptionThread(int id) :
 		ofThread(){
 	this->id = id;
-	this->url = "https://www.google.com/speech-api/v1/recognize?xjerr=1&client=chromium&lang="+language;
+
 	this->bFinished = false;
 	this->isEncoded = false;
 	this->bFree = true;
 	total_samples = 0;
+}
+
+void ofxGSTTTranscriptionThread::setup(int deviceId, string language){
+	url = "https://www.google.com/speech-api/v1/recognize?xjerr=1&client=chromium&lang="+language;
+	this->deviceId = deviceId;
 }
 
 void ofxGSTTTranscriptionThread::setFilename(char * _filename){
@@ -29,13 +34,13 @@ bool ofxGSTTTranscriptionThread::isFinished(){
 }
 
 void ofxGSTTTranscriptionThread::startTranscription(){
-	ofLog(OF_LOG_VERBOSE, "start transcription");
+	ofLog(OF_LOG_VERBOSE, "start transcription (device%d)",deviceId);
 	isEncoded = false;
 	startThread(true,false);
 }
 
 void ofxGSTTTranscriptionThread::stopTranscription(){
-	ofLog(OF_LOG_VERBOSE, "start transcription");
+	ofLog(OF_LOG_VERBOSE, "stop transcription (device%d)",deviceId);
 	bFinished = true;
 	stopThread();
 }
@@ -45,7 +50,7 @@ void ofxGSTTTranscriptionThread::threadedFunction(){
 		//encode with libFlac
 		isEncoded = encodeToFlac();
 		if(!isEncoded){
-			ofLog(OF_LOG_ERROR, "ENCODING FAILD");
+			ofLog(OF_LOG_ERROR, "ENCODING FAILD (device%d)",deviceId);
 			threadRunning = false;
 			return;
 		}
@@ -59,7 +64,7 @@ void ofxGSTTTranscriptionThread::threadedFunction(){
 }
 
 bool ofxGSTTTranscriptionThread::flacToGoogle(){
-	ofLog(OF_LOG_VERBOSE, "send flac to google");
+	ofLog(OF_LOG_VERBOSE, "send flac to google (device%d)",deviceId);
 	CURL *curl;
 	CURLcode res;
 
@@ -77,14 +82,14 @@ bool ofxGSTTTranscriptionThread::flacToGoogle(){
 			CURLFORM_FILE,
 			flacFile,
 			CURLFORM_CONTENTTYPE,
-			"audio/x-flac; rate=16000",
+			"audio/x-flac",// rate=16000",
 			CURLFORM_END);
 
 	curl = curl_easy_init();
 
 	// set header
 	headerlist = curl_slist_append(headerlist, "Expect:");
-	headerlist = curl_slist_append(headerlist, "Content-Type: audio/x-flac; rate=16000");
+	headerlist = curl_slist_append(headerlist, "Content-Type: audio/x-flac; rate=44000");
 	if(curl){
 		//set options
 		curl_easy_setopt(curl,
@@ -97,6 +102,7 @@ bool ofxGSTTTranscriptionThread::flacToGoogle(){
 		callBackData data;
 		data.id = id;
 		data.timestamp = ofGetSystemTime();
+		data.deviceId = deviceId;
 		curl_easy_setopt(curl, CURLOPT_WRITEDATA, &data);
 		curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, writeResponseFunc);
 
@@ -115,7 +121,7 @@ bool ofxGSTTTranscriptionThread::flacToGoogle(){
 }
 
 bool ofxGSTTTranscriptionThread::encodeToFlac(){
-	ofLog(OF_LOG_VERBOSE, "init encoding");
+	ofLog(OF_LOG_VERBOSE, "init encoding (device%d)",deviceId);
 	FLAC__bool ok = true;
 	FLAC__StreamEncoder *encoder = 0;
 	FLAC__StreamEncoderInitStatus init_status;
@@ -169,7 +175,7 @@ bool ofxGSTTTranscriptionThread::encodeToFlac(){
 		}
 	}
 
-	ofLog(OF_LOG_VERBOSE, "start encoding");
+	ofLog(OF_LOG_VERBOSE, "start encoding (device%d)",deviceId);
 	/* read blocks of samples from WAVE file and feed to encoder */
 	if(ok){
 		size_t left = (size_t) total_samples;

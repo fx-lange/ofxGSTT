@@ -9,7 +9,7 @@ void gsttApp::setup(){
 	soundStream.setup(this, 0, 2, sampleRate, bufferSize, 4);
 
     //init ofxGSTT which starts listening here
- 	gstt.setup(sampleRate,"de-de");
+ 	gstt.setup(sampleRate,"de");
 
  	//register listener function to googles response events
 	ofAddListener(gsttApiResponseEvent,this,&gsttApp::gsttResponse);

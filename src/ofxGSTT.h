@@ -6,23 +6,28 @@
 #include "ofxTimer.h"
 #include "sndfile.h"
 
+#define OFXGSTT_DEFAULTDEVICE_ID -1
+
 class ofxGSTT{
 public:
 	ofxGSTT();
 
-	void setup(int sampleRate,string language, float _volumeThreshold = 0.05);
+	void setup(int sampleRate, string language, float _volumeThreshold = 0.05);
 	void setListening(bool listen = true);
+	void addDevice(int deviceId);
 
-	bool isRecording();
+	bool isRecording(int deviceId = OFXGSTT_DEFAULTDEVICE_ID);
 
-	void audioIn(ofAudioEventArgs & event);
+	void audioInByDevice(ofxAudioDeviceArgs & event);
+	void audioInWODevice(ofAudioEventArgs & event);
+	void audioIn(float * buffer,int bufferSize, int nChannels, int deviceId = OFXGSTT_DEFAULTDEVICE_ID);
 
 	//GUI settings
 	float volumeThreshold;
 
 protected:
-	void prepareRecording();
-	void finishRecording();
+	void prepareRecording(int deviceIdx);
+	void finishRecording(int deviceIdx);
 
 	vector<ofxGSTTTranscriptionThread*> transcriber;
 	string language;
@@ -32,17 +37,24 @@ protected:
 	int sampleRate;
 	vector<float> left;
 	vector<float> right;
-	float smoothedVol;
 	bool bListen;
 
 	/*** SOUND RECORDING ***/
-	bool bActiveVolume;
-	bool bRecording;
-	bool bRecordingBlocked;
 	int transcriptorId;
-	ofxTimer timerRecording;
 	SF_INFO info;
-	SNDFILE* outfile;
+
+	vector<int> deviceIds;
+	vector<SNDFILE*> outfiles;
+	vector<float> smoothedVolume;
+	vector<ofxTimer*> timer;
+	vector<bool> bRecording;
+	vector<bool> bRecordingBlocked;
+	vector<bool> bActiveVolume;
 };
+
+/*
+ * TODO nice to have:
+ * a SF_INFO per device - so each device can have its own settings!
+ */
 
 #endif

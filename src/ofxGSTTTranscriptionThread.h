@@ -14,6 +14,7 @@
 
 struct callBackData{
 	int id;
+	int deviceId;
 	long timestamp;
 };
 
@@ -23,14 +24,18 @@ static size_t writeResponseFunc(void *ptr, size_t size, size_t nmemb, callBackDa
 	response.threadId = data->id;
 	response.tSend = data->timestamp;
 	response.tReceived = ofGetSystemTime();
+	response.deviceId = data->deviceId;
 
+//	char text[1024];
+//	memcpy(text,ptr,size);
+//	printf("TEXT: %s",text);
 	//decode via json
 	googleResponseParser parser;
 	parser.parseJSON((char*) ptr);
 
 	response.msg = parser.utterance;
-	response.confidence = parser.confidence;
 	response.status = parser.status;
+	response.confidence = parser.confidence;
 
 	ofNotifyEvent(gsttApiResponseEvent, response);
 
@@ -39,9 +44,11 @@ static size_t writeResponseFunc(void *ptr, size_t size, size_t nmemb, callBackDa
 
 class ofxGSTTTranscriptionThread: protected ofThread{
 public:
-	ofxGSTTTranscriptionThread(int id, string language);
+	ofxGSTTTranscriptionThread(int id);
 	virtual ~ofxGSTTTranscriptionThread(){
 	}
+
+	void setup(int deviceId, string language);
 
 	void setFilename(char filename[]);
 
@@ -55,6 +62,7 @@ public:
 
 protected:
 	int id;
+	int deviceId;
 	char wavFile[64];
 	char flacFile[64];
 	bool bFinished;

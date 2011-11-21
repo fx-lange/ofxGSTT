@@ -20,6 +20,7 @@ public:
 
 	int status;
 	int threadId;
+	int deviceId;
 	long tSend;
 	long tReceived;
 	int source;
@@ -27,6 +28,15 @@ public:
 	float confidence;
 };
 
+class ofxAudioDeviceArgs: public ofAudioEventArgs{
+public:
+	ofxAudioDeviceArgs(){
+		deviceId = -1;
+	}
+	int deviceId;
+};
+
 extern ofEvent<ofxGSTTResponseArgs> gsttApiResponseEvent;
+extern ofEvent<ofxAudioDeviceArgs> audioDeviceEvent; //TODO hat hier in der Klasse nichts zu suchen!
 
 #endif
