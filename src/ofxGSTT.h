@@ -6,6 +6,9 @@
 #include "ofxTimer.h"
 #include "sndfile.h"
 
+#include "FLAC/metadata.h"
+#include "FLAC/stream_encoder.h"
+
 #define OFXGSTT_DEFAULTDEVICE_ID -1
 
 class ofxGSTT{
@@ -50,6 +53,7 @@ protected:
 	vector<bool> bRecording;
 	vector<bool> bRecordingBlocked;
 	vector<bool> bActiveVolume;
+	vector<ofxGSTTTranscriptionThread*> deviceTanscriber;
 };
 
 /*

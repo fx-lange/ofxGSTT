@@ -58,6 +58,7 @@ void ofxGSTT::addDevice(int deviceId){
 	timer.push_back(t);
 	bRecording.push_back(false);
 	bRecordingBlocked.push_back(false);
+	deviceTanscriber.push_back(NULL);
 
 	ofDirectory dir;
 	if(!dir.doesDirectoryExist("tmpAudio/device"+ofToString(deviceId)+"/")){
@@ -172,6 +173,7 @@ void ofxGSTT::prepareRecording(int deviceIdx){
 	nextTranscriber->setup(deviceIds[deviceIdx],language);
 	nextTranscriber->setFilename(filename);
 	nextTranscriber->reserve();
+	deviceTanscriber[deviceIdx] = nextTranscriber;
 	sprintf(filename, "%s.wav", filename);
 
 	outfiles[deviceIdx] = sf_open(filename, SFM_WRITE, &info);
@@ -185,6 +187,8 @@ void ofxGSTT::prepareRecording(int deviceIdx){
 void ofxGSTT::finishRecording(int deviceIdx){
 	ofLog(OF_LOG_VERBOSE, "finish recording (device%d)",deviceIds[deviceIdx]);
 	bRecordingBlocked[deviceIdx] = true;
-	transcriber[transcriptorId]->startTranscription();
 	sf_close(outfiles[deviceIdx]);
+	deviceTanscriber[deviceIdx]->startTranscription();
 }
+
+
