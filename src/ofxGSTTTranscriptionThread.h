@@ -8,9 +8,11 @@
 
 #include "FLAC/metadata.h"
 #include "FLAC/stream_encoder.h"
-#include <curl/curl.h>
+#include <curl.h>
 
 #define READSIZE 1024
+
+using namespace std;
 
 struct callBackData{
 	int id;
