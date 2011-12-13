@@ -1,8 +1,7 @@
-#include "gsttApp.h"
 
+#include "gsttApp.h"
 //--------------------------------------------------------------
 void gsttApp::setup(){
-
     //init oF soundstream
 	int sampleRate = 16000;
 	int bufferSize = 256;
