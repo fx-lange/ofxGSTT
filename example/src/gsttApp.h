@@ -1,9 +1,10 @@
-#ifndef _TEST_APP
-#define _TEST_APP
+#pragma once
 
 #include "ofMain.h"
 #include "ofxTimer.h"
 #include "ofxGSTT.h"
+
+
 
 class gsttApp: public ofSimpleApp{
 
@@ -29,6 +30,4 @@ public:
 	ofSoundStream soundStream;
 	bool bListening;
 };
-
-#endif
 

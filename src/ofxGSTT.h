@@ -11,6 +11,8 @@
 
 #define OFXGSTT_DEFAULTDEVICE_ID -1
 
+using namespace std;
+
 class ofxGSTT{
 public:
 	ofxGSTT();

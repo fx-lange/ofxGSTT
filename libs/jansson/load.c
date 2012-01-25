@@ -420,7 +420,7 @@ static void lex_scan_string(lex_t *lex, json_error_t *error)
                     case 'n': *t = '\n'; break;
                     case 'r': *t = '\r'; break;
                     case 't': *t = '\t'; break;
-                    default: assert(0);
+                    default: assert(0); break;
                 }
                 t++;
                 p++;
