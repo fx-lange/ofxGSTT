@@ -144,6 +144,10 @@ void ofxGSTT::audioIn(float * buffer,int bufferSize, int nChannels, int deviceId
 			sf_write_float(outfiles[deviceIdx], buffer, bufferSize * 2);
 		}
 	}
+//
+//	if(deviceId>10){
+//		delete[] buffer;
+//	}
 }
 
 void ofxGSTT::prepareRecording(int deviceIdx){
