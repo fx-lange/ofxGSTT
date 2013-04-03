@@ -29,7 +29,7 @@ void ofxGSTT::setup(int sampleRate,string language, float _volumeThreshold){
 	//add and setup default device
 	addDevice(OFXGSTT_DEFAULTDEVICE_ID);
 
-	ofAddListener(ofEvents.audioReceived, this, &ofxGSTT::audioInWODevice);
+	ofAddListener(ofEvents().audioReceived, this, &ofxGSTT::audioInWODevice);
 	ofAddListener(audioDeviceEvent, this, &ofxGSTT::audioInByDevice);
 	bListen = true;
 }
@@ -39,10 +39,10 @@ void ofxGSTT::setListening(bool listen){
 		return; //nothing to change/do
 	}else{
 		if(listen){
-			ofAddListener(ofEvents.audioReceived, this, &ofxGSTT::audioInWODevice);
+			ofAddListener(ofEvents().audioReceived, this, &ofxGSTT::audioInWODevice);
 			ofAddListener(audioDeviceEvent, this, &ofxGSTT::audioInByDevice);
 		}else{
-			ofRemoveListener(ofEvents.audioReceived, this, &ofxGSTT::audioInWODevice);
+			ofRemoveListener(ofEvents().audioReceived, this, &ofxGSTT::audioInWODevice);
 			ofRemoveListener(audioDeviceEvent, this, &ofxGSTT::audioInByDevice);
 		}
 		bListen = listen;

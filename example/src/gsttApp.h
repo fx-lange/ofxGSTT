@@ -1,12 +1,9 @@
 #pragma once
 
 #include "ofMain.h"
-#include "ofxTimer.h"
 #include "ofxGSTT.h"
 
-
-
-class gsttApp: public ofSimpleApp{
+class gsttApp: public ofBaseApp{
 
 public:
 	void setup();

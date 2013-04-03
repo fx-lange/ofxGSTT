@@ -1,3 +1,2 @@
 ofxTimer
-ofxThread
 ofxGSTT
