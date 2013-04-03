@@ -1,5 +1,5 @@
-
 #include "gsttApp.h"
+
 //--------------------------------------------------------------
 void gsttApp::setup(){
     //init oF soundstream
@@ -34,7 +34,7 @@ void gsttApp::audioIn(float * input, int bufferSize, int nChannels){
 	event.buffer = input;
 	event.bufferSize = bufferSize;
 	event.nChannels = nChannels;
-	ofNotifyEvent(ofEvents.audioReceived,event);
+	ofNotifyEvent(ofEvents().audioReceived,event);
 }
 
 void gsttApp::gsttResponse(ofxGSTTResponseArgs & response){
