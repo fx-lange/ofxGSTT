@@ -1,12 +1,12 @@
 /***
  * Class to decode Googles response via jansson
+ * REVISIT naming: parser is also parsed object
  */
 
-#ifndef _RESPONSEPARSER_H_
-#define _RESPONSEPARSER_H_
+#pragma once
 
 #include "ofMain.h"
-#include "jansson.h"
+#include "ofxJSONElement.h"
 
 class googleResponseParser{
 public:
@@ -15,58 +15,34 @@ public:
 	int status;
 	float confidence;
 
+	ofxJSONElement root;
+
 	void parseJSON(char * jsonLine){
-		json_t* root;
-		json_t* result;
-		json_t* hypotheses;
-		json_error_t error;
 
-		// load json.
-		root = json_loads(jsonLine, 0, &error);
-		if(!root){
-			ofLog(OF_LOG_ERROR, "error: on jsonLine:%d %s", error.line, error.text);
-			return;
+		bool parsingSuccessful = root.parse(jsonLine);
+		if (parsingSuccessful) {
+			cout << root.getRawString() << endl;
+		} else {
+			cout  << "Failed to parse JSON" << endl;
 		}
 
-		json_unpack(root, "{s:o}", "hypotheses", &hypotheses);
+		if(root.isMember("errors")) {
+			cout << "error " + root.getRawString();
+		} else if(root.isArray()) {
+			status = root["status"].asInt();
 
-		result = json_object_get(root, "status");
-		if(!json_is_integer(result)){
-			ofLog(OF_LOG_ERROR, "error: cannot get status from json");
-			return;
-		}
-		status = json_integer_value(result);
-		if(status == 0){
-			if(json_array_size(hypotheses) > 0){
-				result = json_array_get(hypotheses, 0);
-				parseGoogleJSON(result);
+			if(status == 0){
+				ofxJSONElement hypotheses = root["hypotheses"];
+				if(hypotheses.size() > 0){
+					utterance = hypotheses[0]["utterance"];
+					confidence = hypotheses[0]["confidence"];
+				}else{
+					confidence = 0;
+					utterance = "no hypotheses";
+				}
 			}else{
-				confidence = 0;
-				utterance = "";
+				cout << "status: " + status << endl;
 			}
 		}
-
-		delete root;
-	}
-private:
-	void parseGoogleJSON(json_t*& root){
-
-		// utterance
-		json_t* node = json_object_get(root, "utterance");
-		if(!json_is_string(node)){
-			ofLog(OF_LOG_ERROR, "error: cannot get utterance from response");
-			return;
-		}
-		utterance = json_string_value(node);
-
-		// confidence
-		node = json_object_get(root, "confidence");
-		if(!json_is_real(node)){
-			ofLog(OF_LOG_ERROR, "error: cannot get confidence from response");
-			return;
-		}
-		confidence = json_real_value(node);
 	}
 };
-
-#endif

@@ -1,2 +1,3 @@
 ofxTimer
+ofxJSON
 ofxGSTT
