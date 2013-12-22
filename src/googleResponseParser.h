@@ -34,8 +34,8 @@ public:
 			if(status == 0){
 				ofxJSONElement hypotheses = root["hypotheses"];
 				if(hypotheses.size() > 0){
-					utterance = hypotheses[0]["utterance"];
-					confidence = hypotheses[0]["confidence"];
+					utterance = hypotheses[0]["utterance"].asString();
+					confidence = hypotheses[0]["confidence"].asFloat();
 				}else{
 					confidence = 0;
 					utterance = "no hypotheses";
