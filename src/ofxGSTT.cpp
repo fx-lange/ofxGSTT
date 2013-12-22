@@ -173,7 +173,7 @@ void ofxGSTT::prepareRecording(int deviceIdx){
 	}
 
 	char filename[32];
-	sprintf(filename, "data/tmpAudio/device%d/%d ",deviceIds[deviceIdx],transcriptorId);
+	sprintf(filename, "data/tmpAudio/device%d/%d",deviceIds[deviceIdx],transcriptorId);
 	nextTranscriber->setup(deviceIds[deviceIdx],language);
 	nextTranscriber->setFilename(filename);
 	nextTranscriber->reserve();
@@ -182,7 +182,8 @@ void ofxGSTT::prepareRecording(int deviceIdx){
 
 	outfiles[deviceIdx] = sf_open(filename, SFM_WRITE, &info);
 	if(!outfiles[deviceIdx]){
-		ofLog(OF_LOG_ERROR, "CANT OPEN FILE");
+		ofLog(OF_LOG_ERROR, "CAN NOT OPEN FILE "+ofToString(filename));
+		ofLogError("sf error code: "+ofToString(sf_error(outfiles[deviceIdx])));
 	}else{
 		bRecordingBlocked[deviceIdx] = false;
 	}
