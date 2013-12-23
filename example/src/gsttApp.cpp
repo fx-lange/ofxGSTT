@@ -16,7 +16,7 @@ void gsttApp::setup(){
 
 	ofSetFrameRate(60);
 	ofBackground(0, 0, 0);
-//	ofSetLogLevel(OF_LOG_VERBOSE);
+	ofSetLogLevel(OF_LOG_VERBOSE);
 
 	responseStr = "";
 }
@@ -28,7 +28,7 @@ void gsttApp::update(){
 //--------------------------------------------------------------
 void gsttApp::audioIn(float * input, int bufferSize, int nChannels){
     //redirect audioIn as ofEvents.audioReceived
-    //dont know why ofSoundStream doesnt send audioReceived events
+    //don't know why ofSoundStream doesn't send audioReceived events
 
 	ofAudioEventArgs event;
 	event.buffer = input;
