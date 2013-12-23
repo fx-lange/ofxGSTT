@@ -8,7 +8,7 @@ void gsttApp::setup(){
 	soundStream.setup(this, 0, 2, sampleRate, bufferSize, 4);
 
     //init ofxGSTT which starts listening here
- 	gstt.setup(sampleRate,"de");
+ 	gstt.setup(sampleRate,"de",0.5f);
 
  	//register listener function to googles response events
 	ofAddListener(gsttApiResponseEvent,this,&gsttApp::gsttResponse);

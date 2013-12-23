@@ -153,7 +153,7 @@ bool ofxGSTTTranscriptionThread::encodeToFlac(){
 
 	// allocate the encoder
 	if((encoder = FLAC__stream_encoder_new()) == NULL){
-		ofLog(OF_LOG_ERROR, " allocating encoder\n");
+		ofLog(OF_LOG_ERROR, "allocating encoder failed\n");
 		fclose(fin);
 		return false;
 	}
@@ -169,8 +169,10 @@ bool ofxGSTTTranscriptionThread::encodeToFlac(){
 	if(ok){
 		init_status = FLAC__stream_encoder_init_file(encoder, flacFile, NULL, NULL);
 		if(init_status != FLAC__STREAM_ENCODER_INIT_STATUS_OK){
-			ofLog(OF_LOG_ERROR, "initializing encoder: ");
-			ofLog(OF_LOG_ERROR, FLAC__StreamEncoderInitStatusString[init_status]);
+			ofLogError( "initializing encoder failed: ");
+			ofLogError( FLAC__StreamEncoderInitStatusString[init_status]);
+//			FLAC__stream_encoder_get_verify_decoder_state(encoder);
+			ofLogError( FLAC__stream_encoder_get_resolved_state_string(encoder));
 			ok = false;
 		}
 	}

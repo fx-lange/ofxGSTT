@@ -65,8 +65,8 @@ public:
 protected:
 	int id;
 	int deviceId;
-	char wavFile[64];
-	char flacFile[64];
+	char wavFile[128];
+	char flacFile[128];
 	bool bFinished;
 	bool isEncoded;
 	bool bFree;
