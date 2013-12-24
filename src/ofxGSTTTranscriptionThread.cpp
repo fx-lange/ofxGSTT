@@ -11,8 +11,11 @@ ofxGSTTTranscriptionThread::ofxGSTTTranscriptionThread(int id) :
 }
 
 void ofxGSTTTranscriptionThread::setup(int deviceId, string language){
-	url = "https://www.google.com/speech-api/v1/recognize?xjerr=1&client=chromium&lang="+language;
+	string url = "https://www.google.com/speech-api/v1/recognize?xjerr=1&client=chromium&lang="+language;
 	this->deviceId = deviceId;
+
+	curl.setup();
+	curl.setURL(url);
 }
 
 void ofxGSTTTranscriptionThread::setFilename(char * _filename){
@@ -63,61 +66,19 @@ void ofxGSTTTranscriptionThread::threadedFunction(){
 	}
 }
 
-bool ofxGSTTTranscriptionThread::flacToGoogle(){
+void ofxGSTTTranscriptionThread::flacToGoogle(){
 	ofLog(OF_LOG_VERBOSE, "send flac to google (device%d)",deviceId);
-	CURL *curl;
-	CURLcode res;
 
-	struct curl_httppost *formpost = NULL;
-	struct curl_httppost *lastptr = NULL;
-	struct curl_slist *headerlist = NULL;
+	curl.addFormFile("file",ofToString(flacFile),"audio/x-flac");
 
-	curl_global_init(CURL_GLOBAL_ALL);
+    // set header
+    curl.addHeader("Expect:");
+    curl.addHeader("Content-Type: audio/x-flac; rate=16000");
 
-	// set form
-	curl_formadd(&formpost,
-			&lastptr,
-			CURLFORM_COPYNAME,
-			"file",
-			CURLFORM_FILE,
-			flacFile,
-			CURLFORM_CONTENTTYPE,
-			"audio/x-flac",// rate=16000",
-			CURLFORM_END);
+    curl.perform();
+    cout << curl.getResponseBody() << endl;
 
-	curl = curl_easy_init();
-
-	// set header
-	headerlist = curl_slist_append(headerlist, "Expect:");
-	headerlist = curl_slist_append(headerlist, "Content-Type: audio/x-flac; rate=44000");
-	if(curl){
-		//set options
-		curl_easy_setopt(curl,
-				CURLOPT_URL,
-				url.c_str());
-		curl_easy_setopt(curl, CURLOPT_HTTPHEADER, headerlist);
-		curl_easy_setopt(curl, CURLOPT_HTTPPOST, formpost);
-
-		//set callback function and callback data for the https response
-		callBackData data;
-		data.id = id;
-		data.timestamp = ofGetSystemTime();
-		data.deviceId = deviceId;
-		curl_easy_setopt(curl, CURLOPT_WRITEDATA, &data);
-		curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, writeResponseFunc);
-
-		//submit form
-		res = curl_easy_perform(curl);
-
-		//cleanup
-		curl_easy_cleanup(curl);
-		curl_formfree(formpost);
-		curl_slist_free_all(headerlist);
-		return true;
-	}else{
-		ofLog(OF_LOG_ERROR, "google request failed");
-		return false;
-	}
+    curl.clear();
 }
 
 bool ofxGSTTTranscriptionThread::encodeToFlac(){

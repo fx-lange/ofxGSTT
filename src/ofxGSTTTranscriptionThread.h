@@ -5,10 +5,10 @@
 #include "ofThread.h"
 #include "googleResponseParser.h"
 #include "ofxGSTTEvent.h"
+#include "ofxSSL.h"
 
 #include "FLAC/metadata.h"
 #include "FLAC/stream_encoder.h"
-#include <curl.h>
 
 #define READSIZE 1024
 
@@ -22,6 +22,7 @@ struct callBackData{
 
 //callback function for curl response
 static size_t writeResponseFunc(void *ptr, size_t size, size_t nmemb, callBackData * data){
+	ofLogVerbose("write response func");
 	ofxGSTTResponseArgs response;
 	response.threadId = data->id;
 	response.tSend = data->timestamp;
@@ -71,11 +72,10 @@ protected:
 	bool isEncoded;
 	bool bFree;
 
-	string url;
-
 	virtual void threadedFunction();
 
-	bool flacToGoogle();
+	ofxSSL curl;
+	void flacToGoogle();
 
 	bool encodeToFlac();
 	//ENCODE TO FLAC STUFF

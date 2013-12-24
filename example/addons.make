@@ -1,3 +1,4 @@
 ofxTimer
+ofxSSL
 ofxJSON
 ofxGSTT
