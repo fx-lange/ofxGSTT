@@ -2,7 +2,12 @@
 
 //--------------------------------------------------------------
 void gsttApp::setup(){
-    //init oF soundstream
+	ofSetFrameRate(60);
+	ofBackground(0, 0, 0);
+	ofSetLogLevel(OF_LOG_VERBOSE);
+	ofxSSL::appendData = true; //only needed to get show http errors
+
+	//init oF soundstream
 	int sampleRate = 16000;
 	int bufferSize = 256;
 	soundStream.setup(this, 0, 2, sampleRate, bufferSize, 4);
@@ -11,12 +16,8 @@ void gsttApp::setup(){
  	gstt.setup(sampleRate,"de",0.5f);
 
  	//register listener function to googles response events
-	ofAddListener(gsttApiResponseEvent,this,&gsttApp::gsttResponse);
+	ofAddListener(ofxGSTTTranscriptionThread::gsttApiResponseEvent,this,&gsttApp::gsttResponse);
 	bListening = true;
-
-	ofSetFrameRate(60);
-	ofBackground(0, 0, 0);
-//	ofSetLogLevel(OF_LOG_VERBOSE);
 
 	responseStr = "";
 }
@@ -39,6 +40,7 @@ void gsttApp::audioIn(float * input, int bufferSize, int nChannels){
 
 void gsttApp::gsttResponse(ofxGSTTResponseArgs & response){
 	cout << "Response: " << response.msg << endl << "with confidence: " << ofToString(response.confidence) << endl;
+	cout << "processing time(ms): " << ofToString(response.tReceived - response.tSend) << endl;
 	if(response.msg != ""){
 		responseStr += response.msg + "\n";
 	}

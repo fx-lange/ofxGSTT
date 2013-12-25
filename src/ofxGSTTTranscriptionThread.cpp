@@ -1,6 +1,6 @@
 #include "ofxGSTTTranscriptionThread.h"
 
- ofEvent<ofxGSTTResponseArgs> ofxGSTTTranscriptionThread::gsttApiResponseEvent = ofEvent<ofxGSTTResponseArgs>();
+ofEvent<ofxGSTTResponseArgs> ofxGSTTTranscriptionThread::gsttApiResponseEvent = ofEvent<ofxGSTTResponseArgs>();
 
 ofxGSTTTranscriptionThread::ofxGSTTTranscriptionThread(int id) :
 		ofThread(){
@@ -71,9 +71,6 @@ void ofxGSTTTranscriptionThread::threadedFunction(){
 void ofxGSTTTranscriptionThread::flacToGoogle(){
 	ofLog(OF_LOG_VERBOSE, "send flac to google (device%d)",deviceId);
 
-	ofxGSTTResponseArgs response;
-    response.threadId = id;
-    response.tSend = ofGetSystemTime();
 
 	curl.addFormFile("file",ofToString(flacFile),"audio/x-flac");
 
@@ -81,19 +78,23 @@ void ofxGSTTTranscriptionThread::flacToGoogle(){
     curl.addHeader("Expect:");
     curl.addHeader("Content-Type: audio/x-flac; rate=16000");
 
+	ofxGSTTResponseArgs response;
+    response.deviceId = deviceId;
+    response.tSend = ofGetSystemTime();
     curl.perform();
 
-    response.tReceived = ofGetSystemTime();
-    response.deviceId = deviceId;
     //decode via json
     googleResponseParser parser;
-    parser.parseJSON(curl.getResponseBody());
+    bool validResponse = parser.parseJSON(curl.getResponseBody());
 
-    response.msg = parser.utterance;
-    response.status = parser.status;
-    response.confidence = parser.confidence;
+    if(validResponse){
+        response.tReceived = ofGetSystemTime();
+        response.msg = parser.utterance;
+        response.status = parser.status;
+        response.confidence = parser.confidence;
 
-    ofNotifyEvent(gsttApiResponseEvent, response);
+        ofNotifyEvent(gsttApiResponseEvent, response);
+    }
 
     curl.clear();
 }

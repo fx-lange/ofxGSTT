@@ -14,10 +14,27 @@
 
 using namespace std;
 
+struct callBackData{
+	int id;
+	int deviceId;
+	long timestamp;
+};
+
+//
+//	response.msg = parser.utterance;
+//	response.status = parser.status;
+//	response.confidence = parser.confidence;
+//
+//	ofNotifyEvent(gsttApiResponseEvent, response);
+//
+//	return size * nmemb;
+//}
+
 class ofxGSTTTranscriptionThread: protected ofThread{
 public:
 	ofxGSTTTranscriptionThread(int id);
-	virtual ~ofxGSTTTranscriptionThread(){}
+	virtual ~ofxGSTTTranscriptionThread(){
+	}
 
 	void setup(int deviceId, string language);
 

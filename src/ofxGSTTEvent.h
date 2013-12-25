@@ -10,8 +10,7 @@
 class ofxGSTTResponseArgs: public ofEventArgs{
 public:
 	ofxGSTTResponseArgs(){
-		threadId = 0;
-		confidence = 0.0;
+		confidence = 0.0f;
 		msg = "";
 		source = 0;
 		tSend = tReceived = -1;
@@ -19,7 +18,6 @@ public:
 	}
 
 	int status;
-	int threadId;
 	int deviceId;
 	long tSend;
 	long tReceived;
@@ -36,7 +34,6 @@ public:
 	int deviceId;
 };
 
-extern ofEvent<ofxGSTTResponseArgs> gsttApiResponseEvent;
 extern ofEvent<ofxAudioDeviceArgs> audioDeviceEvent; //TODO hat hier in der Klasse nichts zu suchen!
 
 #endif

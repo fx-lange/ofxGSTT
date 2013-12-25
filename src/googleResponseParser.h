@@ -17,17 +17,17 @@ public:
 
 	ofxJSONElement root;
 
-	void parseJSON(const string & jsonLine){
+	bool parseJSON(const string & jsonLine){
 
 		bool parsingSuccessful = root.parse(jsonLine);
 		if (!parsingSuccessful) {
-			cout  << "Failed to parse JSON" << endl;
-			return;
+			ofLogError( "Failed to parse JSON:" + jsonLine);
+			return false;
 		}
 
 		if(root.isMember("errors")) {
 			cout << "error " + root.getRawString();
-		} else if(root.isArray()) {
+		} else if(root.isObject()) {
 			status = root["status"].asInt();
 
 			if(status == 0){
@@ -39,9 +39,11 @@ public:
 					confidence = 0;
 					utterance = "no hypotheses";
 				}
-			}else{
-				cout << "status: " + status << endl;
+				return true;
 			}
 		}
+
+        ofLogVerbose("no valid response: ") << root.getRawString() << endl;
+        return false;
 	}
 };
