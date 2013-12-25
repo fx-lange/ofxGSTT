@@ -13,7 +13,7 @@ OF_ROOT = ../../..
 USER_CFLAGS = 
 
 
-# USER_LDFLAGS allows to pass custom flags to the linker
+# USER_LDFLAGS allows to pass custom flags to the li	nker
 # for example libraries like:
 # USER_LDFLAGS = libs/libawesomelib.a
 

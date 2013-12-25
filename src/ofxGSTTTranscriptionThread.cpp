@@ -1,5 +1,7 @@
 #include "ofxGSTTTranscriptionThread.h"
 
+ ofEvent<ofxGSTTResponseArgs> ofxGSTTTranscriptionThread::gsttApiResponseEvent = ofEvent<ofxGSTTResponseArgs>();
+
 ofxGSTTTranscriptionThread::ofxGSTTTranscriptionThread(int id) :
 		ofThread(){
 	this->id = id;
@@ -69,6 +71,10 @@ void ofxGSTTTranscriptionThread::threadedFunction(){
 void ofxGSTTTranscriptionThread::flacToGoogle(){
 	ofLog(OF_LOG_VERBOSE, "send flac to google (device%d)",deviceId);
 
+	ofxGSTTResponseArgs response;
+    response.threadId = id;
+    response.tSend = ofGetSystemTime();
+
 	curl.addFormFile("file",ofToString(flacFile),"audio/x-flac");
 
     // set header
@@ -76,7 +82,18 @@ void ofxGSTTTranscriptionThread::flacToGoogle(){
     curl.addHeader("Content-Type: audio/x-flac; rate=16000");
 
     curl.perform();
-    cout << curl.getResponseBody() << endl;
+
+    response.tReceived = ofGetSystemTime();
+    response.deviceId = deviceId;
+    //decode via json
+    googleResponseParser parser;
+    parser.parseJSON(curl.getResponseBody());
+
+    response.msg = parser.utterance;
+    response.status = parser.status;
+    response.confidence = parser.confidence;
+
+    ofNotifyEvent(gsttApiResponseEvent, response);
 
     curl.clear();
 }

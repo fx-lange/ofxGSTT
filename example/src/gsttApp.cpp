@@ -16,7 +16,7 @@ void gsttApp::setup(){
 
 	ofSetFrameRate(60);
 	ofBackground(0, 0, 0);
-	ofSetLogLevel(OF_LOG_VERBOSE);
+//	ofSetLogLevel(OF_LOG_VERBOSE);
 
 	responseStr = "";
 }

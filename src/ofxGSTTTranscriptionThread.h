@@ -14,42 +14,10 @@
 
 using namespace std;
 
-struct callBackData{
-	int id;
-	int deviceId;
-	long timestamp;
-};
-
-//callback function for curl response
-static size_t writeResponseFunc(void *ptr, size_t size, size_t nmemb, callBackData * data){
-	ofLogVerbose("write response func");
-	ofxGSTTResponseArgs response;
-	response.threadId = data->id;
-	response.tSend = data->timestamp;
-	response.tReceived = ofGetSystemTime();
-	response.deviceId = data->deviceId;
-
-//	char text[1024];
-//	memcpy(text,ptr,size);
-//	printf("TEXT: %s",text);
-	//decode via json
-	googleResponseParser parser;
-	parser.parseJSON((char*) ptr);
-
-	response.msg = parser.utterance;
-	response.status = parser.status;
-	response.confidence = parser.confidence;
-
-	ofNotifyEvent(gsttApiResponseEvent, response);
-
-	return size * nmemb;
-}
-
 class ofxGSTTTranscriptionThread: protected ofThread{
 public:
 	ofxGSTTTranscriptionThread(int id);
-	virtual ~ofxGSTTTranscriptionThread(){
-	}
+	virtual ~ofxGSTTTranscriptionThread(){}
 
 	void setup(int deviceId, string language);
 

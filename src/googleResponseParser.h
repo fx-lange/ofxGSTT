@@ -17,13 +17,12 @@ public:
 
 	ofxJSONElement root;
 
-	void parseJSON(char * jsonLine){
+	void parseJSON(const string & jsonLine){
 
 		bool parsingSuccessful = root.parse(jsonLine);
-		if (parsingSuccessful) {
-			cout << root.getRawString() << endl;
-		} else {
+		if (!parsingSuccessful) {
 			cout  << "Failed to parse JSON" << endl;
+			return;
 		}
 
 		if(root.isMember("errors")) {
