@@ -5,9 +5,11 @@ the first prototype is finished. have a look at the example and please let me kn
 feedback is welcome!
 
 Credits:
+----------------
 it is ported from the processing library by Florian Schulz (http://stt.getflourish.com/) which is based on Mike Pultz article (http://mikepultz.com/2011/03/accessing-google-speech-api-chrome-11/) that shows how to use the technology offered by Google without a browser
 
-Dependencies:
+Dependencies
+----------------
 [ofxTimer](https://github.com/fx-lange/ofxTimer)
 [ofxJSON](https://github.com/fx-lange/ofxJSON) 
 [ofxSSL](https://github.com/fx-lange/ofxSSL)
