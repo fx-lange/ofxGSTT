@@ -1,2 +1,3 @@
-example/obj/*
-example/bin/*
+example*/obj/*
+example*/bin/*
+!example*/bin/data/

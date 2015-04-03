@@ -1,19 +1,30 @@
 ofxGSTT
 ================
-openFrameworks addon/wrapper to the inofficial google speech to text api
+openFrameworks addon/wrapper to the Google Speech To Text API v2. 
 
-The first prototype is finished. Have a look at the example and please let me know if you have any problems while using it.
+Unfortunately the first API version doesn't work anymore and API v2 is officially limited to 50 requests per day even people reported that they were able to get up to 500 responses per day.
 
-feedback is welcome!
+Anyway I can't recommend using this addon in a production environment - only for prototyping purposes.
+
+Before you can start you need to generate your own [Speech API Key](http://www.chromium.org/developers/how-tos/api-keys).
+
+Check out the examples - feedback is really welcome!
 
 Credits:
 ----------------
-It is ported from the processing [library](http://stt.getflourish.com/) by Florian Schulz, which is based on Mike Pultz [article](http://mikepultz.com/2011/03/accessing-google-speech-api-chrome-11/) that shows how to use the technology offered by Google without a browser.
+Originally this addon was ported from the processing [library](http://stt.getflourish.com/) by Florian Schulz, which was based on Mike Pultz [article](http://mikepultz.com/2011/03/accessing-google-speech-api-chrome-11/) that showed how to use the technology offered by Google without a browser.
+
+Informations to switch from v1 to v2 were found [here](https://github.com/gillesdemey/google-speech-v2).
+
+Examples:
+----------------
+
+* example-api_only: not using the addon at all, only showcasing the api request with a prerecorded audio file
 
 Dependencies
 ----------------
 * [ofxTimer](https://github.com/fx-lange/ofxTimer)
-* [ofxJSON](https://github.com/fx-lange/ofxJSON) 
+* [ofxJSON](https://github.com/jefftimesten/ofxJSON) 
 * [ofxSSL](https://github.com/fx-lange/ofxSSL)
 * sndfile - recording audio to wav
 * libFlac - encoding wav to flac
