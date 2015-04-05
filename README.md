@@ -29,6 +29,5 @@ Dependencies
 * [ofxJSON](https://github.com/jefftimesten/ofxJSON) 
 * [ofxSSL](https://github.com/fx-lange/ofxSSL)
 * sndfile - recording audio to wav
-* libFlac - encoding wav to flac
 
-sndfile and libFlac are included as static libs for unix(32 and 64bit).
+sndfile are included as static libs for unix(32 and 64bit).
