@@ -13,19 +13,20 @@
 
 using namespace std;
 
-class ofxGSTT{
+class ofxGSTT : public ofBaseSoundInput{
 public:
 	ofxGSTT();
 
-	void setup(int sampleRate, string language, float _volumeThreshold = 0.05);
+	void setup(int sampleRate, int nChannels, string language, string key, float _volumeThreshold = 0.05);
 	void setListening(bool listen = true);
 	void addDevice(int deviceId);
 
 	bool isRecording(int deviceId = OFXGSTT_DEFAULTDEVICE_ID);
 
-	void audioInByDevice(ofxAudioDeviceArgs & event);
-	void audioInWODevice(ofAudioEventArgs & event);
-	void audioIn(float * buffer,int bufferSize, int nChannels, int deviceId = OFXGSTT_DEFAULTDEVICE_ID);
+//	void audioInByDevice(ofxAudioDeviceArgs & event);
+//	void audioInWODevice(ofAudioEventArgs & event);
+	virtual void audioIn( ofSoundBuffer& buffer );
+	virtual void audioIn(float * buffer,int bufferSize, int nChannels, int deviceId = OFXGSTT_DEFAULTDEVICE_ID);
 
 	//GUI settings
 	float volumeThreshold;
@@ -35,13 +36,10 @@ protected:
 	void finishRecording(int deviceIdx);
 
 	vector<ofxGSTTTranscriptionThread*> transcriber;
-	string language;
+	string language, key;
 
 	/*** SOUND INPUT ***/
-	int bufferSize;
 	int sampleRate;
-	vector<float> left;
-	vector<float> right;
 	bool bListen;
 
 	/*** SOUND RECORDING ***/

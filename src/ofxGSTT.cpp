@@ -6,20 +6,16 @@ ofxGSTT::ofxGSTT(){
 	transcriptorId = 0;
 }
 
-void ofxGSTT::setup(int sampleRate,string language, float _volumeThreshold){
-	/*** SOUND INPUT ***/
-	bufferSize = 256;
-	left.assign(bufferSize, 0.0);
-	right.assign(bufferSize, 0.0);
-
+void ofxGSTT::setup(int sampleRate, int nChannels, string language, string key, float _volumeThreshold){
 	/*** SOUND RECORDING ***/
 	info.format = SF_FORMAT_WAV | SF_FORMAT_PCM_16;
 	info.frames = sampleRate * 60; //TODO revisit -> why *60? because of 60fps?
 	info.samplerate = sampleRate;
-	info.channels = 2;
+	info.channels = nChannels;
 	volumeThreshold = _volumeThreshold;
 
 	this->language = language;
+	this->key = key;
 
 	ofDirectory dir;
 	if(!dir.doesDirectoryExist("tmpAudio")){
@@ -29,24 +25,11 @@ void ofxGSTT::setup(int sampleRate,string language, float _volumeThreshold){
 	//add and setup default device
 	addDevice(OFXGSTT_DEFAULTDEVICE_ID);
 
-	ofAddListener(ofEvents().audioReceived, this, &ofxGSTT::audioInWODevice);
-	ofAddListener(audioDeviceEvent, this, &ofxGSTT::audioInByDevice);
 	bListen = true;
 }
 
 void ofxGSTT::setListening(bool listen){
-	if(listen == bListen){
-		return; //nothing to change/do
-	}else{
-		if(listen){
-			ofAddListener(ofEvents().audioReceived, this, &ofxGSTT::audioInWODevice);
-			ofAddListener(audioDeviceEvent, this, &ofxGSTT::audioInByDevice);
-		}else{
-			ofRemoveListener(ofEvents().audioReceived, this, &ofxGSTT::audioInWODevice);
-			ofRemoveListener(audioDeviceEvent, this, &ofxGSTT::audioInByDevice);
-		}
-		bListen = listen;
-	}
+	bListen = listen;
 }
 
 void ofxGSTT::addDevice(int deviceId){
@@ -78,12 +61,18 @@ bool ofxGSTT::isRecording(int deviceId){
 	return false;
 }
 
-void ofxGSTT::audioInByDevice(ofxAudioDeviceArgs & event){
-	audioIn(event.buffer,event.bufferSize,event.nChannels,event.deviceId);
-}
+//void ofxGSTT::audioInByDevice(ofxAudioDeviceArgs & event){
+//	audioIn(event.buffer,event.bufferSize,event.nChannels,event.deviceId);
+//}
+//
+//void ofxGSTT::audioInWODevice(ofAudioEventArgs & event){
+//	audioIn(event.buffer,event.bufferSize,event.nChannels);
+//}
 
-void ofxGSTT::audioInWODevice(ofAudioEventArgs & event){
-	audioIn(event.buffer,event.bufferSize,event.nChannels);
+void ofxGSTT::audioIn(ofSoundBuffer & buffer){
+//	ofLogVerbose("ofxGSTT::audioIn") << buffer.getDeviceID();
+//	audioIn(&buffer[0],buffer.size(),buffer.getNumChannels(),-1);
+	audioIn(&buffer[0], buffer.getNumFrames(), buffer.getNumChannels(), -1);
 }
 
 void ofxGSTT::audioIn(float * buffer,int bufferSize, int nChannels, int deviceId){
@@ -95,9 +84,13 @@ void ofxGSTT::audioIn(float * buffer,int bufferSize, int nChannels, int deviceId
 		}
 	}
 
+//	ofLogVerbose("audioIn") << "device idx: " << deviceIdx;
+
 	if(bRecordingBlocked[deviceIdx]){//TODO ARRAY
 		return;
 	}
+
+//	ofLogVerbose("audioIn") << "buffer size: " << bufferSize;
 
 	float curVol = 0.0;
 
@@ -105,14 +98,25 @@ void ofxGSTT::audioIn(float * buffer,int bufferSize, int nChannels, int deviceId
 	int numCounted = 0;
 
 	//lets go through each sample and calculate the root mean square which is a rough way to calculate volume
+	vector<float> left;
+	vector<float> right;
+	left.assign(bufferSize, 0.0);
+	right.assign(bufferSize, 0.0);
 	for(int i = 0; i < bufferSize; i++){
-		left[i] = buffer[i * 2];
-		right[i] = buffer[i * 2 + 1];
+		if(nChannels == 1){
+			left[i] = buffer[i];
+			curVol += left[i] * left[i];
+			numCounted += 1;
+		}else if(nChannels == 2){
+			left[i] = buffer[i * 2];
+			right[i] = buffer[i * 2 + 1];
 
-		curVol += left[i] * left[i];
-		curVol += right[i] * right[i];
-		numCounted += 2;
-	}//TODO mehrfachverwendung von left & right - problem
+			curVol += left[i] * left[i];
+			curVol += right[i] * right[i];
+			numCounted += 2;
+		}
+
+	}
 
 	//this is how we get the mean of rms :)
 	curVol /= (float) numCounted;
@@ -129,6 +133,8 @@ void ofxGSTT::audioIn(float * buffer,int bufferSize, int nChannels, int deviceId
 
 	bool bActiveVolume = scaledCurVolume > volumeThreshold;
 
+//	ofLogVerbose("audioIn") << "volume: " << scaledCurVolume << " active: " << bActiveVolume;
+
 	//TODO revisit: should be in an extra update function?!
 	if(bActiveVolume){
 		timer[deviceIdx]->reset();
@@ -141,7 +147,8 @@ void ofxGSTT::audioIn(float * buffer,int bufferSize, int nChannels, int deviceId
 			finishRecording(deviceIdx);
 			prepareRecording(deviceIdx);
 		}else{
-			sf_write_float(outfiles[deviceIdx], buffer, bufferSize * 2);
+//			ofLogVerbose("ofxGSTT::audioIn") << "write float";
+			sf_write_float(outfiles[deviceIdx], buffer, bufferSize * nChannels);
 		}
 	}
 //
@@ -175,7 +182,7 @@ void ofxGSTT::prepareRecording(int deviceIdx){
 	string dataPath = ofToDataPath("tmpAudio");
 	char filename[128];
 	sprintf(filename, "%s/device%d/%d",dataPath.c_str(),deviceIds[deviceIdx],transcriptorId);
-	nextTranscriber->setup(deviceIds[deviceIdx],language);
+	nextTranscriber->setup(deviceIds[deviceIdx],language,key);
 	nextTranscriber->setFilename(filename);
 	nextTranscriber->reserve();
 	deviceTanscriber[deviceIdx] = nextTranscriber;

@@ -20,23 +20,13 @@ struct callBackData{
 	long timestamp;
 };
 
-//
-//	response.msg = parser.utterance;
-//	response.status = parser.status;
-//	response.confidence = parser.confidence;
-//
-//	ofNotifyEvent(gsttApiResponseEvent, response);
-//
-//	return size * nmemb;
-//}
-
 class ofxGSTTTranscriptionThread: protected ofThread{
 public:
 	ofxGSTTTranscriptionThread(int id);
 	virtual ~ofxGSTTTranscriptionThread(){
 	}
 
-	void setup(int deviceId, string language);
+	void setup(int deviceId, string language, string key);
 
 	void setFilename(char filename[]);
 
@@ -52,21 +42,13 @@ protected:
 	int id;
 	int deviceId;
 	char wavFile[128];
-	char flacFile[128];
 	bool bFinished;
-	bool isEncoded;
 	bool bFree;
 
 	virtual void threadedFunction();
 
 	ofxSSL curl;
-	void flacToGoogle();
-
-	bool encodeToFlac();
-	//ENCODE TO FLAC STUFF
-	unsigned total_samples; /* can use a 32-bit number due to WAVE size limitations */
-	FLAC__byte buffer[READSIZE/*samples*/* 2/*bytes_per_sample*/* 2/*channels*/]; /* we read the WAVE data into here */
-    FLAC__int32	pcm[READSIZE/*samples*/* 2/*channels*/];
+	void sendGoogleRequest();
 };
 
 #endif

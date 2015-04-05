@@ -25,15 +25,15 @@ public:
 	string msg;
 	float confidence;
 };
-
-class ofxAudioDeviceArgs: public ofAudioEventArgs{
-public:
-	ofxAudioDeviceArgs(){
-		deviceId = -1;
-	}
-	int deviceId;
-};
-
-extern ofEvent<ofxAudioDeviceArgs> audioDeviceEvent; //TODO hat hier in der Klasse nichts zu suchen!
+//
+//class ofxAudioDeviceArgs: public ofAudioEventArgs{
+//public:
+//	ofxAudioDeviceArgs(){
+//		deviceId = -1;
+//	}
+//	int deviceId;
+//};
+//
+//extern ofEvent<ofxAudioDeviceArgs> audioDeviceEvent; //TODO hat hier in der Klasse nichts zu suchen!
 
 #endif

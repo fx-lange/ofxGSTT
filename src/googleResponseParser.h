@@ -28,19 +28,20 @@ public:
 		if(root.isMember("errors")) {
 			cout << "error " + root.getRawString();
 		} else if(root.isObject()) {
-			status = root["status"].asInt();
+//			status = root["status"].asInt();
 
-			if(status == 0){
-				ofxJSONElement hypotheses = root["hypotheses"];
-				if(hypotheses.size() > 0){
-					utterance = hypotheses[0]["utterance"].asString();
-					confidence = hypotheses[0]["confidence"].asFloat();
+//			if(status == 0){
+//				result["result"][0]["alternative"][0]["transcript"];
+				ofxJSONElement alternative = root["result"][0]["alternative"];
+				if(alternative.size() > 0){
+					utterance = alternative[0]["transcript"].asString();
+					confidence = alternative[0]["confidence"].asFloat();
 				}else{
 					confidence = 0;
-					utterance = "no hypotheses";
+					utterance = "no results";
 				}
 				return true;
-			}
+//			}
 		}
 
         ofLogVerbose("no valid response: ") << root.getRawString() << endl;
