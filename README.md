@@ -19,9 +19,13 @@ Informations to switch from v1 to v2 were found [here](https://github.com/gilles
 Examples:
 ----------------
 
-* example-api_only: 
+* example-gstt_api_only: 
 	
 	not using the addon at all, only showcasing the api request with a prerecorded audio file
+
+* example-gstt_basics:
+
+	basic addon example for recording and transcripting
 
 Dependencies
 ----------------

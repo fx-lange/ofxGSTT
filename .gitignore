@@ -1,3 +1,5 @@
 example*/obj/*
 example*/bin/*
+example*/.settings/
 !example*/bin/data/
+example*/bin/data/tmpAudio
