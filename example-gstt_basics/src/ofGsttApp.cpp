@@ -49,7 +49,7 @@ void ofGsttApp::draw(){
 	}else{
 		ofSetColor(20,20,20);
 	}
-	ofEllipse(ofGetWidth()/2,ofGetHeight()/2,200,200);
+	ofDrawEllipse(ofGetWidth()/2,ofGetHeight()/2,200,200);
 
 	ofSetColor(255,255,255);
 	ofDrawBitmapString(responseStr,50,50);

@@ -5,9 +5,6 @@
 #include "ofxTimer.h"
 #include "sndfile.h"
 
-#include "FLAC/metadata.h"
-#include "FLAC/stream_encoder.h"
-
 #define OFXGSTT_DEFAULTDEVICE_ID -1
 
 using namespace std;
@@ -48,7 +45,7 @@ protected:
 	bool bListen;
 
 	/*** SOUND RECORDING ***/
-	int transcriptorId;
+	int transcriberId;
 	SF_INFO info;
 
 	vector<int> deviceIds;

@@ -2,7 +2,7 @@
 
 ofxGSTT::ofxGSTT(){
 	bListen = false;
-	transcriptorId = 0;
+	transcriberId = 0;
 	sampleRate = volumeThreshold = -1;
 }
 
@@ -140,12 +140,12 @@ void ofxGSTT::audioIn(float * buffer,int bufferSize, int nChannels, int deviceId
 void ofxGSTT::prepareRecording(int deviceIdx){
 	ofLog(OF_LOG_VERBOSE, "prepare recording (device%d)",deviceIds[deviceIdx]);
 	ofxGSTTTranscriptionThread * nextTranscriber = NULL;
-	transcriptorId = 0;
+	transcriberId = 0;
 	for(int i = 0; i < (int)transcriber.size(); ++i){
 		ofxGSTTTranscriptionThread * tmpTranscriber = transcriber[i];
 		if(tmpTranscriber->isFree()){
 			ofLog(OF_LOG_VERBOSE, "free transcriber found");
-			transcriptorId = i;
+			transcriberId = i;
 			nextTranscriber = tmpTranscriber;
 			break;
 		}
@@ -154,14 +154,14 @@ void ofxGSTT::prepareRecording(int deviceIdx){
 	//create new one if nothing is free
 	if(nextTranscriber == NULL){
 		ofLog(OF_LOG_VERBOSE, "no transcriber free -> create new one");
-		transcriptorId = transcriber.size();
-		nextTranscriber = new ofxGSTTTranscriptionThread(transcriptorId);
+		transcriberId = transcriber.size();
+		nextTranscriber = new ofxGSTTTranscriptionThread(transcriberId);
 		transcriber.push_back(nextTranscriber);
 	}
 
 	string dataPath = ofToDataPath("tmpAudio");
 	char filename[128];
-	sprintf(filename, "%s/device%d/%d",dataPath.c_str(),deviceIds[deviceIdx],transcriptorId);
+	sprintf(filename, "%s/device%d/%d",dataPath.c_str(),deviceIds[deviceIdx],transcriberId);
 	nextTranscriber->setup(deviceIds[deviceIdx],language,key);
 	nextTranscriber->setFilename(filename);
 	nextTranscriber->reserve();
