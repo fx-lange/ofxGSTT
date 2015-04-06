@@ -5,21 +5,21 @@ void ofGsttApp::setup(){
 	ofSetFrameRate(60);
 	ofBackground(0, 0, 0);
 	ofSetLogLevel(OF_LOG_VERBOSE);
-	ofxSSL::appendData = false; //only needed to get show http errors
 
 	//init oF soundstream
 	int sampleRate = 44100;
 	int bufferSize = 256;
 	int nChannels = 1;
 	soundStream.printDeviceList();
-	soundStream.setDeviceID(3);
+//	soundStream.setDeviceID(3);
 	soundStream.setup(0, nChannels, sampleRate, bufferSize, 4);
 
-    //init ofxGSTT which starts listening here
+    //init ofxGSTT
  	gstt.setup(sampleRate,nChannels,"en-us",YOUR_KEY_AS_A_STRING,0.5f);
+ 	//make gstt owner of the sound input stream
 	soundStream.setInput(gstt);
 
- 	//register listener function to googles response events
+ 	//register listener function to transcript response events
 	ofAddListener(ofxGSTTTranscriptionThread::gsttApiResponseEvent,this,&ofGsttApp::gsttResponse);
 	bListening = true;
 
