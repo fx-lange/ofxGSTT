@@ -34,4 +34,4 @@ Dependencies
 * [ofxSSL](https://github.com/fx-lange/ofxSSL)
 * sndfile - recording audio to wav
 
-sndfile are included as static libs for unix(32 and 64bit).
+libsndfile is included as static libs for unix(32 and 64bit). for mac you might need to `brew install libsndfile` and for win you can try to install the binaries found [here](http://www.mega-nerd.com/libsndfile/#Download).
