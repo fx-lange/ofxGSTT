@@ -2,8 +2,8 @@
 
 ofxGSTT::ofxGSTT(){
 	bListen = false;
-	volumeThreshold = 0.f;
 	transcriptorId = 0;
+	sampleRate = volumeThreshold = -1;
 }
 
 void ofxGSTT::setup(int sampleRate, int nChannels, string language, string key, float _volumeThreshold){
@@ -23,7 +23,7 @@ void ofxGSTT::setup(int sampleRate, int nChannels, string language, string key, 
 	}
 
 	//add and setup default device
-	addDevice(OFXGSTT_DEFAULTDEVICE_ID);
+	addDevice(OFXGSTT_DEFAULTDEVICE_ID); //TODO multi device business
 
 	bListen = true;
 }
@@ -52,7 +52,7 @@ void ofxGSTT::addDevice(int deviceId){
 }
 
 bool ofxGSTT::isRecording(int deviceId){
-	for(int i=0;i<deviceIds.size();++i){
+	for(int i=0;i<(int)deviceIds.size();++i){
 		if(deviceIds[i]==deviceId){
 			return bRecording[i];
 		}
@@ -61,36 +61,23 @@ bool ofxGSTT::isRecording(int deviceId){
 	return false;
 }
 
-//void ofxGSTT::audioInByDevice(ofxAudioDeviceArgs & event){
-//	audioIn(event.buffer,event.bufferSize,event.nChannels,event.deviceId);
-//}
-//
-//void ofxGSTT::audioInWODevice(ofAudioEventArgs & event){
-//	audioIn(event.buffer,event.bufferSize,event.nChannels);
-//}
-
 void ofxGSTT::audioIn(ofSoundBuffer & buffer){
-//	ofLogVerbose("ofxGSTT::audioIn") << buffer.getDeviceID();
-//	audioIn(&buffer[0],buffer.size(),buffer.getNumChannels(),-1);
-	audioIn(&buffer[0], buffer.getNumFrames(), buffer.getNumChannels(), -1);
+	//TODO make better use of soundbuffer obj
+	audioIn(&buffer[0], buffer.getNumFrames(), buffer.getNumChannels(), -1); //TODO multidevice business
 }
 
 void ofxGSTT::audioIn(float * buffer,int bufferSize, int nChannels, int deviceId){
 	int deviceIdx=0;
-	for(int i=0;i<deviceIds.size();++i){
+	for(int i=0;i<(int)deviceIds.size();++i){
 		if(deviceIds[i]==deviceId){
 			deviceIdx=i;
 			break;
 		}
 	}
 
-//	ofLogVerbose("audioIn") << "device idx: " << deviceIdx;
-
-	if(bRecordingBlocked[deviceIdx]){//TODO ARRAY
+	if(bRecordingBlocked[deviceIdx]){
 		return;
 	}
-
-//	ofLogVerbose("audioIn") << "buffer size: " << bufferSize;
 
 	float curVol = 0.0;
 
@@ -133,8 +120,6 @@ void ofxGSTT::audioIn(float * buffer,int bufferSize, int nChannels, int deviceId
 
 	bool bActiveVolume = scaledCurVolume > volumeThreshold;
 
-//	ofLogVerbose("audioIn") << "volume: " << scaledCurVolume << " active: " << bActiveVolume;
-
 	//TODO revisit: should be in an extra update function?!
 	if(bActiveVolume){
 		timer[deviceIdx]->reset();
@@ -147,24 +132,19 @@ void ofxGSTT::audioIn(float * buffer,int bufferSize, int nChannels, int deviceId
 			finishRecording(deviceIdx);
 			prepareRecording(deviceIdx);
 		}else{
-//			ofLogVerbose("ofxGSTT::audioIn") << "write float";
 			sf_write_float(outfiles[deviceIdx], buffer, bufferSize * nChannels);
 		}
 	}
-//
-//	if(deviceId>10){
-//		delete[] buffer;
-//	}
 }
 
 void ofxGSTT::prepareRecording(int deviceIdx){
 	ofLog(OF_LOG_VERBOSE, "prepare recording (device%d)",deviceIds[deviceIdx]);
 	ofxGSTTTranscriptionThread * nextTranscriber = NULL;
 	transcriptorId = 0;
-	for(int i = 0; i < transcriber.size(); ++i){
+	for(int i = 0; i < (int)transcriber.size(); ++i){
 		ofxGSTTTranscriptionThread * tmpTranscriber = transcriber[i];
 		if(tmpTranscriber->isFree()){
-			ofLog(OF_LOG_VERBOSE, "free transciptor found");
+			ofLog(OF_LOG_VERBOSE, "free transcriber found");
 			transcriptorId = i;
 			nextTranscriber = tmpTranscriber;
 			break;
@@ -173,7 +153,7 @@ void ofxGSTT::prepareRecording(int deviceIdx){
 
 	//create new one if nothing is free
 	if(nextTranscriber == NULL){
-		ofLog(OF_LOG_VERBOSE, "no transciptor free -> create new one");
+		ofLog(OF_LOG_VERBOSE, "no transcriber free -> create new one");
 		transcriptorId = transcriber.size();
 		nextTranscriber = new ofxGSTTTranscriptionThread(transcriptorId);
 		transcriber.push_back(nextTranscriber);

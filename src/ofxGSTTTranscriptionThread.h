@@ -1,14 +1,10 @@
-#ifndef _STTGTRANSCRIPTOR_H_
-#define _STTGTRANSCRIPTOR_H_
+#pragma once
 
 #include "ofMain.h"
 #include "ofThread.h"
 #include "googleResponseParser.h"
 #include "ofxGSTTEvent.h"
 #include "ofxSSL.h"
-
-#include "FLAC/metadata.h"
-#include "FLAC/stream_encoder.h"
 
 #define READSIZE 1024
 
@@ -32,7 +28,7 @@ public:
 
 	void startTranscription();
 	void stopTranscription();
-	void reserve();
+	void reserve(); //TODO mutex?
 	bool isFree();
 	bool isFinished();
 
@@ -50,5 +46,3 @@ protected:
 	ofxSSL curl;
 	void sendGoogleRequest();
 };
-
-#endif

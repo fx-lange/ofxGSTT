@@ -15,7 +15,7 @@ void ofGsttApp::setup(){
 	soundStream.setup(0, nChannels, sampleRate, bufferSize, 4);
 
     //init ofxGSTT
- 	gstt.setup(sampleRate,nChannels,"en-us",YOUR_KEY_AS_A_STRING,0.5f);
+ 	gstt.setup(sampleRate,nChannels,"en-us","YOUR_KEY_AS_A_STRING",0.5f);
  	//make gstt owner of the sound input stream
 	soundStream.setInput(gstt);
 

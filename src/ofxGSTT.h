@@ -1,5 +1,4 @@
-#ifndef _STTG_H_
-#define _STTG_H_
+#pragma once
 
 #include "ofMain.h"
 #include "ofxGSTTTranscriptionThread.h"
@@ -13,6 +12,14 @@
 
 using namespace std;
 
+
+/* TODO nice to have:
+ 	 SF_INFO per device - so each device can have its own settings!
+ 	 thread safe?
+ 	 naming
+ 	 volume calculation, smart detection instead of threshold?
+ */
+
 class ofxGSTT : public ofBaseSoundInput{
 public:
 	ofxGSTT();
@@ -23,8 +30,6 @@ public:
 
 	bool isRecording(int deviceId = OFXGSTT_DEFAULTDEVICE_ID);
 
-//	void audioInByDevice(ofxAudioDeviceArgs & event);
-//	void audioInWODevice(ofAudioEventArgs & event);
 	virtual void audioIn( ofSoundBuffer& buffer );
 	virtual void audioIn(float * buffer,int bufferSize, int nChannels, int deviceId = OFXGSTT_DEFAULTDEVICE_ID);
 
@@ -55,10 +60,3 @@ protected:
 	vector<bool> bActiveVolume;
 	vector<ofxGSTTTranscriptionThread*> deviceTanscriber;
 };
-
-/*
- * TODO nice to have:
- * a SF_INFO per device - so each device can have its own settings!
- */
-
-#endif

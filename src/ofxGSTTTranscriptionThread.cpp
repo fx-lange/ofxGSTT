@@ -8,6 +8,7 @@ ofxGSTTTranscriptionThread::ofxGSTTTranscriptionThread(int id) :
 
 	this->bFinished = false;
 	this->bFree = true;
+	this->deviceId = -1;
 }
 
 void ofxGSTTTranscriptionThread::setup(int deviceId, string language, string key){
@@ -71,6 +72,7 @@ void ofxGSTTTranscriptionThread::sendGoogleRequest(){
 
     std::string responseJson = curl.getResponseBody();
     ofLogNotice("sendGoogleRequest") << responseJson;
+
     //decode via json
     googleResponseParser parser;
     bool validResponse = parser.parseJSON(responseJson);
@@ -78,12 +80,9 @@ void ofxGSTTTranscriptionThread::sendGoogleRequest(){
     if(validResponse){
         response.tReceived = ofGetSystemTime();
         response.msg = parser.utterance;
-        response.status = parser.status;
         response.confidence = parser.confidence;
 
         ofNotifyEvent(gsttApiResponseEvent, response);
-    }else{
-
     }
 
     curl.clear();
