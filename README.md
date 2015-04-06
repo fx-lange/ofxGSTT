@@ -27,6 +27,10 @@ Examples:
 
 	basic addon example for recording and transcripting
 
+* example-gstt_chrome_workaround
+
+	Instead of using ofxGSTT, this workaround uses the Speech to Text API within Google Chrome and sends the results to openFrameworks via WebSockets. Idea (again) ported from Florian Schulz [example](http://mikepultz.com/2011/03/accessing-google-speech-api-chrome-11/). Dependencies: Google Chrome (or Chromium) and [ofxLibwebsockets](git@github.com:labatrockwell/ofxLibwebsockets)
+
 Dependencies
 ----------------
 * [ofxJSON](https://github.com/jefftimesten/ofxJSON) 
