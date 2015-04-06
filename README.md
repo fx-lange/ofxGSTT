@@ -6,6 +6,8 @@ Unfortunately the first API version doesn't work anymore and API v2 is officiall
 
 Anyway I can't recommend using this addon in a production environment - only for prototyping purposes.
 
+For unlimited requests check out the workaround example via Chrome.
+
 Before you start you need to generate your own [Speech API Key](http://www.chromium.org/developers/how-tos/api-keys).
 
 Check out the examples - feedback is really welcome!
@@ -29,7 +31,7 @@ Examples:
 
 * example-gstt_chrome_workaround
 
-	Instead of using ofxGSTT, this workaround uses the Speech to Text API within Google Chrome and sends the results to openFrameworks via WebSockets. Idea (again) ported from Florian Schulz [example](http://mikepultz.com/2011/03/accessing-google-speech-api-chrome-11/). Dependencies: Google Chrome (or Chromium) and [ofxLibwebsockets](git@github.com:labatrockwell/ofxLibwebsockets)
+	Instead of using ofxGSTT, this workaround uses the Speech to Text API within Google Chrome and sends the results to openFrameworks via WebSockets. Idea (again) ported from Florian Schulz [example](http://mikepultz.com/2011/03/accessing-google-speech-api-chrome-11/). Dependencies: Google Chrome (or Chromium) and [ofxLibwebsockets](http://github.com:labatrockwell/ofxLibwebsockets)
 
 Dependencies
 ----------------
