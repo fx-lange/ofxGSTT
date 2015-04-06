@@ -5,7 +5,7 @@
 #include "ofxTimer.h"
 #include "sndfile.h"
 
-#define OFXGSTT_DEFAULTDEVICE_ID -1
+#define OFXGSTT_DEFAULTDEVICE_ID 0
 
 using namespace std;
 
@@ -23,17 +23,20 @@ public:
 
 	void setup(int sampleRate, int nChannels, string language, string key, float _volumeThreshold = 0.05);
 	void setListening(bool listen = true);
-	void addDevice(int deviceId);
 
-	bool isRecording(int deviceId = OFXGSTT_DEFAULTDEVICE_ID);
+	bool isRecording(){
+		return isRecording(OFXGSTT_DEFAULTDEVICE_ID);
+	}
 
 	virtual void audioIn( ofSoundBuffer& buffer );
-	virtual void audioIn(float * buffer,int bufferSize, int nChannels, int deviceId = OFXGSTT_DEFAULTDEVICE_ID);
+	virtual void audioIn(float * buffer,int bufferSize, int nChannels, int deviceId);
 
 	//GUI settings
 	float volumeThreshold;
 
 protected:
+	void addDevice(int deviceId);
+	bool isRecording(int deviceId);
 	void prepareRecording(int deviceIdx);
 	void finishRecording(int deviceIdx);
 

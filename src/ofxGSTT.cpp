@@ -63,7 +63,7 @@ bool ofxGSTT::isRecording(int deviceId){
 
 void ofxGSTT::audioIn(ofSoundBuffer & buffer){
 	//TODO make better use of soundbuffer obj
-	audioIn(&buffer[0], buffer.getNumFrames(), buffer.getNumChannels(), -1); //TODO multidevice business
+	audioIn(&buffer[0], buffer.getNumFrames(), buffer.getNumChannels(), OFXGSTT_DEFAULTDEVICE_ID); //TODO multidevice business
 }
 
 void ofxGSTT::audioIn(float * buffer,int bufferSize, int nChannels, int deviceId){
