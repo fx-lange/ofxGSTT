@@ -35,7 +35,7 @@ public:
 	float volumeThreshold;
 
 protected:
-	void addDevice(int deviceId);
+	void addDevice(int deviceId); //single device - multiple devices not thread safe at all
 	bool isRecording(int deviceId);
 	void prepareRecording(int deviceIdx);
 	void finishRecording(int deviceIdx);
