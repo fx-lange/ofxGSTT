@@ -1,4 +1,3 @@
 ofxJSON
-ofxTimer
 ofxSSL
 ofxGSTT

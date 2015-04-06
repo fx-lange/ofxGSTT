@@ -29,6 +29,7 @@ void ofxGSTT::setup(int sampleRate, int nChannels, string language, string key, 
 }
 
 void ofxGSTT::setListening(bool listen){
+	ofLogVerbose("set listening") << listen;
 	bListen = listen;
 }
 
@@ -36,9 +37,7 @@ void ofxGSTT::addDevice(int deviceId){
 	deviceIds.push_back(deviceId);
 	outfiles.push_back(NULL);
 	smoothedVolume.push_back(0.f);
-	ofxTimer * t=new ofxTimer();
-	t->setup(1000, false);
-	timer.push_back(t);
+	tLastUpdate.push_back(0);
 	bRecording.push_back(false);
 	bRecordingBlocked.push_back(false);
 	deviceTanscriber.push_back(NULL);
@@ -91,8 +90,7 @@ void ofxGSTT::audioIn(float * buffer,int bufferSize, int nChannels, int deviceId
 	right.assign(bufferSize, 0.0);
 	for(int i = 0; i < bufferSize; i++){
 		if(nChannels == 1){
-			left[i] = buffer[i];
-			curVol += left[i] * left[i];
+			curVol += buffer[i] * buffer[i];
 			numCounted += 1;
 		}else if(nChannels == 2){
 			left[i] = buffer[i * 2];
@@ -102,7 +100,6 @@ void ofxGSTT::audioIn(float * buffer,int bufferSize, int nChannels, int deviceId
 			curVol += right[i] * right[i];
 			numCounted += 2;
 		}
-
 	}
 
 	//this is how we get the mean of rms :)
@@ -121,13 +118,13 @@ void ofxGSTT::audioIn(float * buffer,int bufferSize, int nChannels, int deviceId
 	bool bActiveVolume = scaledCurVolume > volumeThreshold;
 
 	//TODO revisit: should be in an extra update function?!
-	if(bActiveVolume){
-		timer[deviceIdx]->reset();
-		timer[deviceIdx]->startTimer();
+	unsigned long long tNow = ofGetElapsedTimeMillis();
+	if(bActiveVolume && bListen){
+		tLastUpdate[deviceIdx] = tNow;
 		bRecording[deviceIdx] = true;
 	}
 	if(bRecording[deviceIdx]){
-		if(timer[deviceIdx]->isTimerFinished()){
+		if(tNow - tLastUpdate[deviceIdx] > 1000){ //TODO magic number, hard coded
 			bRecording[deviceIdx] = false;
 			finishRecording(deviceIdx);
 			prepareRecording(deviceIdx);

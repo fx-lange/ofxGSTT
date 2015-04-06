@@ -29,7 +29,6 @@ Examples:
 
 Dependencies
 ----------------
-* [ofxTimer](https://github.com/fx-lange/ofxTimer)
 * [ofxJSON](https://github.com/jefftimesten/ofxJSON) 
 * [ofxSSL](https://github.com/fx-lange/ofxSSL)
 * sndfile - recording audio to wav

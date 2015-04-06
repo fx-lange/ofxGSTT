@@ -2,7 +2,6 @@
 
 #include "ofMain.h"
 #include "ofxGSTTTranscriptionThread.h"
-#include "ofxTimer.h"
 #include "sndfile.h"
 
 #define OFXGSTT_DEFAULTDEVICE_ID 0
@@ -54,7 +53,7 @@ protected:
 	vector<int> deviceIds;
 	vector<SNDFILE*> outfiles;
 	vector<float> smoothedVolume;
-	vector<ofxTimer*> timer;
+	vector<unsigned long long> tLastUpdate;
 	vector<bool> bRecording;
 	vector<bool> bRecordingBlocked;
 	vector<bool> bActiveVolume;

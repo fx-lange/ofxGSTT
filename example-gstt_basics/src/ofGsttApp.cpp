@@ -15,7 +15,7 @@ void ofGsttApp::setup(){
 	soundStream.setup(0, nChannels, sampleRate, bufferSize, 4);
 
     //init ofxGSTT
- 	gstt.setup(sampleRate,nChannels,"en-us","YOUR_KEY_AS_A_STRING",0.5f);
+ 	gstt.setup(sampleRate,nChannels,"en-us",YOUR_KEY_AS_A_STRING_HERE,0.8f);//have a look at the README
  	//make gstt owner of the sound input stream
 	soundStream.setInput(gstt);
 
@@ -60,7 +60,7 @@ void ofGsttApp::draw(){
 //--------------------------------------------------------------
 void ofGsttApp::keyPressed (int key){
     switch(key){
-        case 'l':
+        case ' ':
             bListening = !bListening;
             gstt.setListening(bListening);
             break;
