@@ -20,18 +20,29 @@ class ofxGSTT : public ofBaseSoundInput{
 public:
 	ofxGSTT();
 
-	void setup(int sampleRate, int nChannels, string language, string key, float _volumeThreshold = 0.05);
-	void setListening(bool listen = true);
+	void setup(int sampleRate, int nChannels, string language, string key);
+
+	void setAutoRecording(bool listen);
+	bool isAutoRecording();
+
+	void setVolumeThreshold(float volumeThreshold);
+	float getVolumeThreshold();
+
+	void startRecording();
+	void stopRecording();
 
 	bool isRecording(){
 		return isRecording(OFXGSTT_DEFAULTDEVICE_ID);
+	}
+
+	float getSmoothedVolume(){
+		return smoothedVolume[OFXGSTT_DEFAULTDEVICE_ID];
 	}
 
 	virtual void audioIn( ofSoundBuffer& buffer );
 	virtual void audioIn(float * buffer,int bufferSize, int nChannels, int deviceId);
 
 	//GUI settings
-	float volumeThreshold;
 
 protected:
 	void addDevice(int deviceId); //single device - multiple devices not thread safe at all
@@ -44,7 +55,8 @@ protected:
 
 	/*** SOUND INPUT ***/
 	int sampleRate;
-	bool bListen;
+	bool bAutoListen, bListen;
+    float volumeThreshold;
 
 	/*** SOUND RECORDING ***/
 	int transcriberId;

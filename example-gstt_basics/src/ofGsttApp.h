@@ -23,6 +23,5 @@ public:
 
 	ofxGSTT gstt;
 	ofSoundStream soundStream;
-	bool bListening;
 };
 

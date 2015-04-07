@@ -1,5 +1,8 @@
 #include "ofGsttApp.h"
 
+bool bAutoRecording = true;
+float volumeThreshold = 0.05f;
+
 //--------------------------------------------------------------
 void ofGsttApp::setup(){
 	ofSetFrameRate(60);
@@ -15,13 +18,15 @@ void ofGsttApp::setup(){
 	soundStream.setup(0, nChannels, sampleRate, bufferSize, 4);
 
     //init ofxGSTT
- 	gstt.setup(sampleRate,nChannels,"en-us",YOUR_KEY_AS_A_STRING_HERE,0.8f);//have a look at the README
+ 	gstt.setup(sampleRate,nChannels,"en-us",YOUR_KEY_AS_A_STRING_HERE);//check the README for generating an API key
+ 	gstt.setAutoRecording(bAutoRecording);
+ 	gstt.setVolumeThreshold(volumeThreshold);
  	//make gstt owner of the sound input stream
 	soundStream.setInput(gstt);
 
  	//register listener function to transcript response events
 	ofAddListener(ofxGSTTTranscriptionThread::gsttApiResponseEvent,this,&ofGsttApp::gsttResponse);
-	bListening = true;
+
 
 	responseStr = "";
 }
@@ -31,10 +36,12 @@ void ofGsttApp::update(){
 }
 
 void ofGsttApp::gsttResponse(ofxGSTTResponseArgs & response){
-	cout << "Response: " << response.msg << endl << "with confidence: " << ofToString(response.confidence) << endl;
-	cout << "processing time(ms): " << ofToString(response.tReceived - response.tSend) << endl;
+	cout << "Response: " << response.msg << endl;
+	cout << "with confidence: " << ofToString(response.confidence) << endl;
+	float tProcessingTime = (response.tReceived - response.tSend)/1000.f;
+	cout << "processing time(seconds): " << ofToString(tProcessingTime) << endl;
 	if(response.msg != ""){
-		responseStr += response.msg + "\n";
+		responseStr += response.msg + " (after "+ofToString(tProcessingTime)+ "s )\n";
 	}
 }
 
@@ -52,7 +59,13 @@ void ofGsttApp::draw(){
 	ofDrawEllipse(ofGetWidth()/2,ofGetHeight()/2,200,200);
 
 	ofSetColor(255,255,255);
-	ofDrawBitmapString(responseStr,50,50);
+	std::string status = "(s/S) start/stop recording\n";
+	status += "( a ) toggle auto recording: " + ofToString(gstt.isAutoRecording());
+	if(gstt.isAutoRecording())
+		status += " (+/-) volume threshold: " + ofToString(gstt.getVolumeThreshold());
+	status += "\nsmoothed volume: " + ofToString(gstt.getSmoothedVolume(),3);
+	ofDrawBitmapString(status,50,20);
+	ofDrawBitmapString(responseStr,50,100);
 
 	ofPopStyle();
 }
@@ -60,10 +73,24 @@ void ofGsttApp::draw(){
 //--------------------------------------------------------------
 void ofGsttApp::keyPressed (int key){
     switch(key){
-        case ' ':
-            bListening = !bListening;
-            gstt.setListening(bListening);
+        case 'a':
+            bAutoRecording = !bAutoRecording;
+            gstt.setAutoRecording(bAutoRecording);
             break;
+        case 's':
+        	gstt.startRecording();
+        	break;
+        case 'S':
+        	gstt.stopRecording();
+        	break;
+        case '+':
+        	volumeThreshold += 0.01f;
+        	gstt.setVolumeThreshold(volumeThreshold);
+        	break;
+        case '-':
+        	volumeThreshold -= 0.01f;
+        	gstt.setVolumeThreshold(volumeThreshold);
+        	break;
     }
 }
 

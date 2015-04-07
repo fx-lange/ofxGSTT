@@ -1,18 +1,18 @@
 #include "ofxGSTT.h"
 
 ofxGSTT::ofxGSTT(){
-	bListen = false;
+	bAutoListen = bListen =  false;
 	transcriberId = 0;
-	sampleRate = volumeThreshold = -1;
+	sampleRate = -1;
+	volumeThreshold = 0.05;
 }
 
-void ofxGSTT::setup(int sampleRate, int nChannels, string language, string key, float _volumeThreshold){
+void ofxGSTT::setup(int sampleRate, int nChannels, string language, string key){
 	/*** SOUND RECORDING ***/
 	info.format = SF_FORMAT_WAV | SF_FORMAT_PCM_16;
 	info.frames = sampleRate * 60; //TODO revisit -> why *60? because of 60fps?
 	info.samplerate = sampleRate;
 	info.channels = nChannels;
-	volumeThreshold = _volumeThreshold;
 
 	this->language = language;
 	this->key = key;
@@ -24,13 +24,37 @@ void ofxGSTT::setup(int sampleRate, int nChannels, string language, string key, 
 
 	//add and setup default device
 	addDevice(OFXGSTT_DEFAULTDEVICE_ID); //TODO multi device business
-
-	bListen = true;
 }
 
-void ofxGSTT::setListening(bool listen){
-	ofLogVerbose("set listening") << listen;
-	bListen = listen;
+void ofxGSTT::setAutoRecording(bool listen){
+	ofLogVerbose("set auto recording") << listen;
+	bAutoListen = listen;
+	if(bAutoListen)
+		bListen = false;
+}
+
+bool ofxGSTT::isAutoRecording(){
+	return bAutoListen;
+}
+
+void ofxGSTT::startRecording(){
+	ofLogVerbose("start recording") << listen;
+	bListen = true;
+	bAutoListen = false;
+}
+
+void ofxGSTT::stopRecording(){
+	ofLogVerbose("stop recording") << listen;
+	bListen = false;
+	bAutoListen = false;
+}
+
+void ofxGSTT::setVolumeThreshold(float volumeThreshold){
+	this->volumeThreshold = ofClamp(volumeThreshold,0,1);
+}
+
+float ofxGSTT::getVolumeThreshold(){
+	return volumeThreshold;
 }
 
 void ofxGSTT::addDevice(int deviceId){
@@ -113,18 +137,18 @@ void ofxGSTT::audioIn(float * buffer,int bufferSize, int nChannels, int deviceId
 
 	//lets scale the vol up to a 0-1 range
 	//float scaledVol = ofMap(smoothedVol, 0.0, 0.17, 0.0, 1.0, true);//TODO set by settings!
-	float scaledCurVolume = ofMap(curVol, 0.0, 0.17, 0.0, 1.0, true);
+//	float scaledCurVolume = ofMap(curVol, 0.0, 0.17, 0.0, 1.0, true);
 
-	bool bActiveVolume = scaledCurVolume > volumeThreshold;
+	bool bActiveVolume = curVol > volumeThreshold;
 
 	//TODO revisit: should be in an extra update function?!
 	unsigned long long tNow = ofGetElapsedTimeMillis();
-	if(bActiveVolume && bListen){
+	if(bListen || (bActiveVolume && bAutoListen)){
 		tLastUpdate[deviceIdx] = tNow;
 		bRecording[deviceIdx] = true;
 	}
 	if(bRecording[deviceIdx]){
-		if(tNow - tLastUpdate[deviceIdx] > 1000){ //TODO magic number, hard coded
+		if(tNow - tLastUpdate[deviceIdx] > 500){ //TODO magic number, hard coded
 			bRecording[deviceIdx] = false;
 			finishRecording(deviceIdx);
 			prepareRecording(deviceIdx);

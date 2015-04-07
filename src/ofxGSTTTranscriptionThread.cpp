@@ -66,7 +66,7 @@ void ofxGSTTTranscriptionThread::sendGoogleRequest(){
 
 	ofxGSTTResponseArgs response;
     response.deviceId = deviceId;
-    response.tSend = ofGetSystemTime();
+    response.tSend = ofGetElapsedTimeMillis();
     curl.perform();
 
 
@@ -78,7 +78,7 @@ void ofxGSTTTranscriptionThread::sendGoogleRequest(){
     bool validResponse = parser.parseJSON(responseJson);
 
     if(validResponse){
-        response.tReceived = ofGetSystemTime();
+        response.tReceived = ofGetElapsedTimeMillis();
         response.msg = parser.utterance;
         response.confidence = parser.confidence;
 
