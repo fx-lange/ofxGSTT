@@ -28,7 +28,7 @@ void ofGsttApp::setup(){
 	ofAddListener(ofxGSTTTranscriptionThread::gsttApiResponseEvent,this,&ofGsttApp::gsttResponse);
 
 
-	responseStr = "";
+	responseStr = "responses:\n(your might want to order them via tSend)\n";
 }
 
 //--------------------------------------------------------------
@@ -42,6 +42,8 @@ void ofGsttApp::gsttResponse(ofxGSTTResponseArgs & response){
 	cout << "processing time(seconds): " << ofToString(tProcessingTime) << endl;
 	if(response.msg != ""){
 		responseStr += response.msg + " (after "+ofToString(tProcessingTime)+ "s )\n";
+	}else{
+		responseStr += "no results\n";
 	}
 }
 

@@ -38,7 +38,7 @@ public:
 					confidence = alternative[0]["confidence"].asFloat();
 				}else{
 					confidence = 0;
-					utterance = "no results";
+					utterance = "";
 				}
 				return true;
 //			}
