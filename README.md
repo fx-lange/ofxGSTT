@@ -1,6 +1,6 @@
 ofxGSTT
 ================
-openFrameworks addon/wrapper to the Google Speech To Text API v2. 
+openFrameworks addon/wrapper to the **Google Speech To Text API v2**. 
 
 Unfortunately the first API version doesn't work anymore and API v2 is officially limited to 50 requests per day and it is still not possible to apply for a higher quota (but people reported that they were able to get up to 500 responses per day). 
 
@@ -31,7 +31,9 @@ basic addon example for recording and transcripting
 
 ### example-gstt_chrome_workaround
 
-Instead of using ofxGSTT, this workaround uses the Speech to Text API within Google Chrome and sends the results to openFrameworks via WebSockets. Idea (again) ported from Florian Schulz [example](http://mikepultz.com/2011/03/accessing-google-speech-api-chrome-11/). Dependencies: Google Chrome (or Chromium) and [ofxLibwebsockets](http://github.com:labatrockwell/ofxLibwebsockets)
+Instead of using ofxGSTT, this workaround uses the Speech to Text API within Google Chrome and sends the results to openFrameworks via WebSockets. Idea (again) ported from Florian Schulz [example](http://mikepultz.com/2011/03/accessing-google-speech-api-chrome-11/). 
+
+Dependencies: Google Chrome (or Chromium) and [ofxLibwebsockets](http://github.com:labatrockwell/ofxLibwebsockets)
 
 Dependencies
 ----------------
